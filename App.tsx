@@ -1,10 +1,10 @@
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
-import { Search, Sparkles, BookOpen, Download, Github, Menu, X, Rocket, Info, ChevronRight, BrainCircuit, Loader2, ArrowLeft, ExternalLink, Copy, Check, Zap } from 'lucide-react';
+import { Search, Sparkles, BookOpen, Download, Github, Menu, X, Rocket, Info, ChevronRight, BrainCircuit, Loader2, ArrowLeft, ExternalLink, Copy, Check, Zap, ChevronLeft } from 'lucide-react';
 import { RESOURCES } from './data/resources';
 import { ResourceCard } from './components/ResourceCard';
-import { Resource, View } from './types';
+import { Resource } from './types';
 import { findResourcesWithAi } from './services/geminiService';
 
 // --- 资源详情页 ---
@@ -39,7 +39,6 @@ const ResourceDetailPage = () => {
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* 左侧主要内容 */}
         <div className="lg:col-span-2 space-y-10">
           <header>
             <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-600 mb-4">
@@ -53,7 +52,6 @@ const ResourceDetailPage = () => {
             </p>
           </header>
 
-          {/* 图片展示区 */}
           {resource.gallery && resource.gallery.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold flex items-center gap-2">展示截图</h2>
@@ -70,7 +68,6 @@ const ResourceDetailPage = () => {
             </div>
           )}
 
-          {/* 详细图文内容 */}
           <div className="prose prose-indigo dark:prose-invert max-w-none">
             <h2 className="text-lg font-bold flex items-center gap-2 mb-4">详细介绍 & 使用指南</h2>
             <div 
@@ -80,7 +77,6 @@ const ResourceDetailPage = () => {
           </div>
         </div>
 
-        {/* 右侧边栏：下载信息 */}
         <div className="lg:col-span-1">
           <div className="sticky top-24 space-y-6">
             <div className="bg-indigo-600 rounded-3xl p-8 text-white shadow-xl shadow-indigo-600/20">
@@ -121,17 +117,6 @@ const ResourceDetailPage = () => {
                 最后更新于: {resource.date}
               </div>
             </div>
-
-            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-3xl p-6">
-              <h4 className="font-bold mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
-                <Info className="w-4 h-4 text-indigo-500" /> 注意事项
-              </h4>
-              <ul className="text-xs text-gray-500 dark:text-gray-400 space-y-3 list-disc pl-4">
-                <li>如遇链接失效，请通过 GitHub 提交 Issue 告知我们。</li>
-                <li>下载后 24 小时内请自行删除，仅供学习参考。</li>
-                <li>软件类资源建议在虚拟机环境下运行测试。</li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>
@@ -142,82 +127,78 @@ const ResourceDetailPage = () => {
 // --- 首页 ---
 const HomePage = () => (
   <div className="animate-in fade-in duration-700">
-    <div className="relative isolate overflow-hidden">
-      <div className="mx-auto max-w-7xl pb-24 pt-10 sm:pb-32 lg:flex lg:px-8 lg:pt-20">
-        <div className="mx-auto max-w-2xl flex-shrink-0 lg:mx-0 lg:max-w-xl lg:pt-8">
-          <div className="mt-24 sm:mt-32 lg:mt-16">
-            <a href="#" className="inline-flex space-x-6">
-              <span className="rounded-full bg-indigo-600/10 px-3 py-1 text-sm font-semibold leading-6 text-indigo-600 ring-1 ring-inset ring-indigo-600/10">
-                最新动态
-              </span>
-              <span className="inline-flex items-center space-x-2 text-sm font-medium leading-6 text-gray-600">
-                <span>刚刚发布了 v2.4 版本</span>
-                <ChevronRight className="h-5 w-5 text-gray-400" />
-              </span>
-            </a>
+    <div className="relative pt-12 pb-24 sm:pt-20 sm:pb-32">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="relative z-10 text-center lg:text-left">
+          <div className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-600/10 mb-8 animate-in slide-in-from-left-4">
+            <Sparkles className="w-4 h-4" />
+            <span>v2.4 全新架构已发布</span>
           </div>
-          <h1 className="mt-10 text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-            FreeShare <span className="text-indigo-600">Pro</span>
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-gray-900 mb-8 leading-[1.15]">
+            FreeShare <span className="text-indigo-600">Pro</span><br />
+            <span className="text-gray-400">自由分享资源门户</span>
           </h1>
-          <p className="mt-6 text-lg leading-8 text-gray-600">
-            专为高级开发者打造的高端资源枢纽。精选软件、进阶视频课程以及深度文档，助您加速成长。
+          <p className="text-lg sm:text-xl text-gray-600 mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0">
+            本网站为一个精品资源枢纽。精选软件、时下流行影视资源、游戏资讯以及各种技术文档，拒绝垃圾广告，每一份资源都经过人工严格审核与实测。
           </p>
-          <div className="mt-10 flex items-center gap-x-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
             <Link
               to="/downloads"
-              className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 flex items-center gap-2"
+              className="w-full sm:w-auto px-8 py-4 bg-indigo-600 text-white rounded-2xl font-bold shadow-2xl shadow-indigo-600/30 hover:bg-indigo-700 hover:-translate-y-1 transition-all flex items-center justify-center gap-2 group"
             >
-              <Rocket className="w-4 h-4" />
-              探索资源
+              <Rocket className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+              探索资源库
             </Link>
-            <Link to="/guide" className="text-sm font-semibold leading-6 text-gray-900 flex items-center gap-2">
-              <BookOpen className="w-4 h-4" />
-              查看指南 <span aria-hidden="true">→</span>
+            <Link 
+              to="/guide" 
+              className="w-full sm:w-auto px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-2xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+            >
+              <BookOpen className="w-5 h-5 text-gray-400" />
+              查看指南
             </Link>
           </div>
         </div>
-        <div className="mx-auto mt-16 flex max-w-2xl sm:mt-24 lg:ml-10 lg:mr-0 lg:mt-0 lg:max-w-none lg:flex-none xl:ml-32">
-          <div className="max-w-3xl flex-none sm:max-w-5xl lg:max-w-none">
-            <div className="rounded-xl bg-gray-900/5 p-2 ring-1 ring-inset ring-gray-900/10 lg:-m-4 lg:rounded-2xl lg:p-4">
-              <img
-                src="https://picsum.photos/seed/freeshare/800/600"
-                alt="应用截图"
-                width={2432}
-                height={1442}
-                className="w-[32rem] rounded-md shadow-2xl ring-1 ring-gray-900/10"
+
+        <div className="relative flex justify-center lg:justify-end pr-0 lg:pr-12">
+          <div className="absolute -top-12 -right-12 w-64 h-64 bg-indigo-100 rounded-full blur-[80px] opacity-40 -z-10"></div>
+          <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-violet-100 rounded-full blur-[80px] opacity-40 -z-10"></div>
+          
+          <div className="relative w-full max-w-[540px] animate-bounce-slow">
+            <div className="rounded-[2.5rem] bg-white p-3 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden">
+               <img
+                src="https://picsum.photos/seed/freeshare_pro/1000/750"
+                alt="应用预览"
+                className="w-full h-auto rounded-[2rem] shadow-inner"
               />
+            </div>
+            <div className="absolute -right-4 bottom-12 sm:-right-8 bg-white/95 backdrop-blur p-5 rounded-2xl shadow-2xl border border-indigo-50 hidden sm:flex items-center gap-4">
+               <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
+                 <Zap className="w-6 h-6 text-white" />
+               </div>
+               <div>
+                 <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Security</div>
+                 <div className="text-base font-black text-gray-900">100% 验证通过</div>
+               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div className="mx-auto max-w-7xl px-6 lg:px-8 py-24 bg-white/50 rounded-3xl mb-20 shadow-inner border border-gray-100">
-      <div className="mx-auto max-w-2xl lg:text-center">
-        <h2 className="text-base font-semibold leading-7 text-indigo-600 uppercase tracking-wide">为什么选择我们？</h2>
-        <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          提供高效交付所需的一切
-        </p>
-      </div>
-      <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
-        <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
-          {[
-            { name: '精选资源', description: '杜绝广告和垃圾内容。仅提供经过验证的高质量工具和学习材料。', icon: Sparkles },
-            { name: '详细文档', description: '为所有软件提供分步骤的安装和激活指南。', icon: BookOpen },
-            { name: '永久免费', description: '基于 Cloudflare 构建，满怀对开发者社区的热忱提供服务。', icon: Rocket },
-          ].map((feature) => (
-            <div key={feature.name} className="flex flex-col">
-              <dt className="flex items-center gap-x-3 text-base font-semibold leading-7 text-gray-900">
-                <feature.icon className="h-5 w-5 flex-none text-indigo-600" aria-hidden="true" />
-                {feature.name}
-              </dt>
-              <dd className="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600">
-                <p className="flex-auto">{feature.description}</p>
-              </dd>
-            </div>
-          ))}
-        </dl>
-      </div>
+    <div className="py-24 grid grid-cols-1 md:grid-cols-3 gap-8 border-t border-gray-100/50">
+      {[
+        { name: '精选资源', desc: '杜绝广告和垃圾内容。仅提供经过验证的高质量工具和学习材料。', icon: Sparkles, color: 'bg-indigo-50 text-indigo-600' },
+        { name: '详细文档', desc: '为所有软件提供分步骤的安装和激活指南，确保小白也能轻松上手。', icon: BookOpen, color: 'bg-violet-50 text-violet-600' },
+        { name: '极致体验', desc: '基于现代 Web 技术构建，配合智能搜索，极速找到你所需的一切。', icon: BrainCircuit, color: 'bg-emerald-50 text-emerald-600' },
+      ].map((feature) => (
+        <div key={feature.name} className="group p-8 bg-white/50 rounded-3xl border border-gray-100 hover:border-indigo-200 hover:bg-white hover:shadow-xl transition-all duration-300">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${feature.color}`}>
+            <feature.icon className="w-6 h-6" />
+          </div>
+          <h3 className="text-xl font-bold mb-3">{feature.name}</h3>
+          <p className="text-gray-500 leading-relaxed text-sm sm:text-base">{feature.desc}</p>
+        </div>
+      ))}
     </div>
   </div>
 );
@@ -228,12 +209,18 @@ const DownloadsPage = () => {
   const [activeCat, setActiveCat] = useState('全部');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResultIds, setAiResultIds] = useState<number[] | null>(null);
+  
+  // 分页状态
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 6;
+  const listTopRef = useRef<HTMLDivElement>(null);
 
   const categories = useMemo(() => {
     const cats = new Set(RESOURCES.map(r => r.category));
     return ['全部', ...Array.from(cats)];
   }, []);
 
+  // 1. 先进行过滤
   const filteredResources = useMemo(() => {
     let list = RESOURCES;
     if (aiResultIds !== null) {
@@ -246,6 +233,24 @@ const DownloadsPage = () => {
       return matchSearch && matchCat;
     });
   }, [search, activeCat, aiResultIds]);
+
+  // 2. 根据过滤后的结果计算分页数据
+  const totalPages = Math.ceil(filteredResources.length / ITEMS_PER_PAGE);
+  const currentItems = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredResources.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredResources, currentPage]);
+
+  // 当搜索条件或分类改变时，重置页码
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, activeCat, aiResultIds]);
+
+  // 翻页滚动到顶部
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    listTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const handleAiSearch = async () => {
     if (!search.trim()) return;
@@ -266,11 +271,11 @@ const DownloadsPage = () => {
   };
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500" ref={listTopRef}>
       <header className="mb-12">
-        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-4">资源下载中心</h1>
-        <p className="text-gray-600 dark:text-gray-400 max-w-2xl">
-          浏览我们精心挑选的开发资源。您可以使用搜索栏，或者让我们的 AI 助手帮您精准查找所需内容。
+        <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">资源库</h1>
+        <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl">
+          精准搜索、极速获取。我们为您维护最新、最全的开发资源列表。
         </p>
       </header>
 
@@ -280,10 +285,10 @@ const DownloadsPage = () => {
             <button
               key={cat}
               onClick={() => { setActiveCat(cat); setAiResultIds(null); }}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+              className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
                 activeCat === cat 
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25' 
-                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                : 'bg-white text-gray-500 border border-gray-100 hover:bg-gray-50'
               }`}
             >
               {cat}
@@ -291,59 +296,87 @@ const DownloadsPage = () => {
           ))}
         </div>
 
-        <div className="relative w-full md:max-w-md group">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-5 w-5 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
-          </div>
+        <div className="relative w-full md:max-w-md">
           <input
             type="text"
-            className="block w-full pl-10 pr-24 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none text-gray-900 dark:text-white"
-            placeholder="搜索..."
+            className="w-full pl-5 pr-32 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none font-medium"
+            placeholder="寻找特定的软件或课程..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAiSearch()}
           />
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 gap-1">
+          <div className="absolute inset-y-2 right-2 flex items-center gap-1">
             {aiResultIds !== null && (
-              <button 
-                onClick={clearAiSearch}
-                className="p-1 text-gray-400 hover:text-red-500 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <button onClick={clearAiSearch} className="p-2 text-gray-400 hover:text-red-500 transition-colors"><X className="w-5 h-5" /></button>
             )}
             <button
               onClick={handleAiSearch}
               disabled={aiLoading}
-              className="flex items-center gap-1 bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-xl hover:bg-indigo-100 transition-colors disabled:opacity-50 text-xs font-bold"
+              className="bg-indigo-600 text-white px-5 h-full rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 text-xs font-bold flex items-center gap-2"
             >
-              {aiLoading ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <BrainCircuit className="w-3.5 h-3.5" />
-              )}
-              AI 搜索
+              {aiLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <BrainCircuit className="w-4 h-4" />}
+              搜索
             </button>
           </div>
         </div>
       </div>
 
-      {filteredResources.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {filteredResources.map(resource => (
-            <ResourceCard key={resource.id} resource={resource} />
-          ))}
-        </div>
+      {currentItems.length > 0 ? (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {currentItems.map(resource => (
+              <ResourceCard key={resource.id} resource={resource} />
+            ))}
+          </div>
+
+          {/* 分页组件 */}
+          {totalPages > 1 && (
+            <div className="mt-16 flex justify-center items-center gap-2">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="p-3 rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-indigo-600 hover:border-indigo-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }).map((_, idx) => {
+                  const pageNum = idx + 1;
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => handlePageChange(pageNum)}
+                      className={`w-11 h-11 rounded-xl text-sm font-bold transition-all ${
+                        currentPage === pageNum
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-110'
+                        : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="p-3 rounded-xl bg-white border border-gray-200 text-gray-500 hover:text-indigo-600 hover:border-indigo-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          )}
+        </>
       ) : (
-        <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-3xl border border-dashed border-gray-300 dark:border-gray-700">
-          <Info className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <h3 className="text-xl font-medium text-gray-900 dark:text-white">未找到相关结果</h3>
-          <button 
-            onClick={() => {setSearch(''); setActiveCat('全部'); setAiResultIds(null);}} 
-            className="mt-6 text-indigo-600 font-semibold hover:underline"
-          >
-            重置所有过滤器
-          </button>
+        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
+          <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-400">
+            <Search className="w-8 h-8" />
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 mb-2">未找到匹配资源</h3>
+          <p className="text-gray-500">换个关键词试试，或者尝试使用 AI 搜索。</p>
+          <button onClick={clearAiSearch} className="mt-6 text-indigo-600 font-bold hover:underline">清除搜索条件</button>
         </div>
       )}
     </div>
@@ -352,41 +385,30 @@ const DownloadsPage = () => {
 
 // --- 指南页 ---
 const GuidePage = () => (
-  <div className="max-w-3xl mx-auto prose prose-indigo dark:prose-invert py-10 animate-in fade-in duration-500">
-    <h1 className="text-4xl font-bold mb-8">使用指南</h1>
-    <section className="mb-12">
-      <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-        <Download className="w-6 h-6 text-indigo-500" />
-        如何下载
-      </h2>
-      <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-        我们的资源托管在高速云平台上。下载步骤如下：
-      </p>
-      <ul className="list-disc pl-5 mt-4 space-y-2 text-gray-600 dark:text-gray-400">
-        <li>点击资源卡片上的 <strong>下载</strong> 按钮。</li>
-        <li>如果显示 <strong>提取码</strong>，点击它可自动复制到剪贴板。</li>
-        <li>在跳转的页面中输入提取码即可解锁下载链接。</li>
-      </ul>
-    </section>
-
-    <section className="mb-12">
-      <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
-        <Sparkles className="w-6 h-6 text-indigo-500" />
-        软件激活
-      </h2>
-      <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-        “办公软件”分类中的大多数工具都是预激活的。但是，我们建议：
-      </p>
-      <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 my-4">
-        <p className="text-sm text-yellow-700 dark:text-yellow-400">
-          <strong>注意：</strong> 请务必查看下载压缩包内的 README.txt 文件，了解具体的安装说明和版本更新。
-        </p>
+  <div className="max-w-3xl mx-auto py-10 animate-in fade-in duration-500">
+    <div className="bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm">
+      <h1 className="text-4xl font-black mb-10 tracking-tight">使用指南</h1>
+      <div className="space-y-12">
+        <section>
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-3 text-indigo-600">
+            <span className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm">1</span>
+            获取下载链接
+          </h2>
+          <p className="text-gray-600 leading-relaxed font-medium">
+            点击资源卡片进入详情页。下载按钮通常需要密码，点击“提取码”后的代码可一键复制。
+          </p>
+        </section>
+        <section>
+          <h2 className="text-xl font-bold mb-4 flex items-center gap-3 text-indigo-600">
+            <span className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm">2</span>
+            版本验证说明
+          </h2>
+          <p className="text-gray-600 leading-relaxed font-medium">
+            我们分享的每一个资源都经过内部实测。如果是软件类，请务必阅读压缩包内的 `README`。
+          </p>
+        </section>
       </div>
-    </section>
-
-    <section className="mt-20 pt-10 border-t border-gray-100 dark:border-gray-800 text-center text-sm text-gray-500 italic">
-      “提供的所有资源仅供教育用途。请通过购买正版软件来支持开发者。”
-    </section>
+    </div>
   </div>
 );
 
@@ -395,52 +417,43 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
-  const navLinks = [
-    { name: '首页', path: '/', icon: Rocket },
-    { name: '资源下载', path: '/downloads', icon: Download },
-    { name: '使用指南', path: '/guide', icon: BookOpen },
-  ];
-
-  // 每次路由变化滚动到顶部
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 selection:bg-indigo-100 selection:text-indigo-900">
-      <nav className="sticky top-0 z-50 glass-card">
+    <div className="min-h-screen bg-mesh">
+      <nav className="sticky top-0 z-50 glass-card border-b border-gray-100/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <Link to="/" className="flex items-center gap-2 group">
-              <div className="bg-indigo-600 p-1.5 rounded-lg shadow-lg group-hover:scale-110 transition-transform">
-                <Zap className="w-5 h-5 text-white" />
+          <div className="flex justify-between h-20 items-center">
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="bg-indigo-600 w-10 h-10 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20 group-hover:scale-110 transition-transform">
+                <Zap className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600">FreeShare</span>
+              <span className="text-2xl font-black tracking-tighter">FreeShare</span>
             </Link>
 
-            <div className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
+            <div className="hidden md:flex items-center gap-10">
+              {[
+                { name: '首页', path: '/', icon: Rocket },
+                { name: '资源库', path: '/downloads', icon: Download },
+                { name: '使用指南', path: '/guide', icon: BookOpen },
+              ].map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center gap-1.5 text-sm font-semibold transition-colors ${
-                    location.pathname === link.path || (link.path === '/downloads' && location.pathname.startsWith('/resource/'))
-                    ? 'text-indigo-600' 
-                    : 'text-gray-600 dark:text-gray-400 hover:text-indigo-600'
+                  className={`text-sm font-bold tracking-tight transition-colors flex items-center gap-2 ${
+                    location.pathname === link.path ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'
                   }`}
                 >
-                  <link.icon className="w-4 h-4" />
+                  <link.icon className="w-4 h-4 opacity-50" />
                   {link.name}
                 </Link>
               ))}
-              <div className="h-6 w-px bg-gray-200 dark:bg-gray-700" />
-              <a href="https://github.com" target="_blank" className="p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors">
-                <Github className="w-5 h-5" />
-              </a>
             </div>
 
             <div className="md:hidden">
-              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-gray-600">
+              <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-gray-500">
                 {isMobileMenuOpen ? <X /> : <Menu />}
               </button>
             </div>
@@ -448,18 +461,10 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         </div>
 
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white dark:bg-gray-800 border-t border-gray-100 p-4 space-y-2 shadow-xl animate-in slide-in-from-top-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-xl text-gray-700 dark:text-gray-200 hover:bg-gray-50"
-              >
-                <link.icon className="w-5 h-5 text-indigo-500" />
-                {link.name}
-              </Link>
-            ))}
+          <div className="md:hidden bg-white border-t p-6 space-y-4 shadow-2xl animate-in slide-in-from-top-4">
+            <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="block font-bold py-2">首页</Link>
+            <Link to="/downloads" onClick={() => setIsMobileMenuOpen(false)} className="block font-bold py-2">资源库</Link>
+            <Link to="/guide" onClick={() => setIsMobileMenuOpen(false)} className="block font-bold py-2">指南</Link>
           </div>
         )}
       </nav>
@@ -468,28 +473,17 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {children}
       </main>
 
-      <footer className="bg-white dark:bg-gray-950 border-t border-gray-100 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
-            <div className="text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                <div className="bg-indigo-600 p-1 rounded">
-                  <Zap className="w-4 h-4 text-white" />
-                </div>
-                <span className="font-bold text-gray-900 dark:text-white">FreeShare Pro</span>
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 text-sm max-w-sm">
-                一个致力于分享高品质内容的开发者社区。
-              </p>
-            </div>
-            
-            <div className="flex gap-6">
-              <a href="#" className="text-gray-400 hover:text-indigo-600"><Zap className="w-5 h-5" /></a>
-              <a href="#" className="text-gray-400 hover:text-indigo-600"><Sparkles className="w-5 h-5" /></a>
-            </div>
+      <footer className="py-20 border-t border-gray-100 bg-white/50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="flex items-center justify-center gap-2 mb-8">
+            <Zap className="w-6 h-6 text-indigo-600" />
+            <span className="text-xl font-black">FreeShare Pro</span>
           </div>
-          <div className="mt-12 pt-8 border-t border-gray-50 dark:border-gray-900 text-center text-xs text-gray-400">
-            &copy; {new Date().getFullYear()} FreeShare Pro. 保留所有权利。基于 Gemini AI 构建。
+          <p className="text-gray-400 text-sm mb-10">&copy; {new Date().getFullYear()} 精心打磨的开发者资源门户</p>
+          <div className="flex justify-center gap-8 text-gray-300">
+            <Rocket className="w-5 h-5 hover:text-indigo-600 transition-colors cursor-pointer" />
+            <Sparkles className="w-5 h-5 hover:text-indigo-600 transition-colors cursor-pointer" />
+            <Zap className="w-5 h-5 hover:text-indigo-600 transition-colors cursor-pointer" />
           </div>
         </div>
       </footer>

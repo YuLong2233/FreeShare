@@ -37,7 +37,7 @@ export const findResourcesWithAi = async (query: string, resources: Resource[]):
     }
     return [];
   } catch (error) {
-    console.error("AI 搜索失败:", error);
+    console.error("搜索失败:", error);
     return [];
   }
 };
