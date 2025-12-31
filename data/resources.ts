@@ -53,8 +53,8 @@ export const RESOURCES: Resource[] = [
   },
   {
     "id": 8,
-    "title": "Python test222",
-    "desc": "test test test test222",
+    "title": "Python test1234",
+    "desc": "test test test test1234",
     "category": "视频课程",
     "date": "2024-05-28",
     "tags": [
