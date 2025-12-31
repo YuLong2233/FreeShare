@@ -1,6 +1,6 @@
 ---
-title: "Python test"
-desc: "test test test test"
+title: "Python test222"
+desc: "test test test test222"
 category: "视频课程"
 date: "2024-05-28"
 tags: ["Python", "自动化", "办公技巧"]
