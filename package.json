@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run gen && vite build",
     "preview": "vite preview",
     "gen": "node scripts/generateResources.mjs"
   },
