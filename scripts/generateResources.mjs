@@ -3,24 +3,27 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
-import { createWriteStream } from 'fs';
-import { pipeline } from 'stream/promises';
+import dotenv from 'dotenv';
+
+// 加载本地环境变量
+dotenv.config({ path: '.env.local' });
 
 const RESOURCES_DIR = './resources';
 const OUTPUT_FILE = './data/resources.ts';
-const PUBLIC_IMAGES_DIR = './public/images';
 
-// ─── 确保目录存在 ─────────────────────────────────────
+// GitHub 配置
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_OWNER = process.env.GITHUB_OWNER || 'YuLong2233';
+const GITHUB_REPO = process.env.GITHUB_REPO || 'FreeShare';
+const RELEASE_TAG = 'media';
+
+// 确保目录存在
 if (!fs.existsSync(RESOURCES_DIR)) fs.mkdirSync(RESOURCES_DIR, { recursive: true });
-if (!fs.existsSync(PUBLIC_IMAGES_DIR)) fs.mkdirSync(PUBLIC_IMAGES_DIR, { recursive: true });
 
-// ─── 工具：判断是否为网络 URL ────────────────────────
+// ─── 工具函数 ────────────────────────────────────────
 const isUrl = (str) => /^https?:\/\//i.test(str);
-
-// ─── 工具：判断是否已是正确的 /images/ 公开路径 ─────
 const isPublicPath = (str) => str.startsWith('/images/');
 
-// ─── 工具：从路径或 URL 获取后缀名 ──────────────────
 const getExtension = (input, fallback = '.png') => {
   try {
     const ext = path.extname(input).toLowerCase();
@@ -30,67 +33,148 @@ const getExtension = (input, fallback = '.png') => {
   }
 };
 
-// ─── 核心：下载网络图片 ──────────────────────────────
-const downloadImage = async (url, destPath) => {
-  try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    await pipeline(res.body, createWriteStream(destPath));
-    return true;
-  } catch (e) {
-    console.warn(`  ⚠️  下载失败 [${url}]: ${e.message}，将保留原始链接`);
-    return false;
-  }
-};
+// ─── GitHub Release 管理 ─────────────────────────────
+let releaseId = null;
+let existingAssets = [];
 
-// ─── 核心：复制本地图片 ──────────────────────────────
-const copyLocalImage = (srcPath, destPath) => {
+const githubHeaders = () => ({
+  'Authorization': `Bearer ${GITHUB_TOKEN}`,
+  'Accept': 'application/vnd.github+json',
+  'X-GitHub-Api-Version': '2022-11-28'
+});
+
+const getOrCreateRelease = async () => {
+  if (!GITHUB_TOKEN) {
+    console.warn('⚠️  未配置 GITHUB_TOKEN，本地图片将保留原始路径');
+    return null;
+  }
+
+  // 尝试查找已有 Release
   try {
-    if (!fs.existsSync(srcPath)) {
-      console.warn(`  ⚠️  本地文件不存在 [${srcPath}]，将跳过`);
-      return false;
+    const res = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/tags/${RELEASE_TAG}`,
+      { headers: githubHeaders() }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      releaseId = data.id;
+      existingAssets = data.assets || [];
+      console.log(`📦 已找到 Release [${RELEASE_TAG}]，ID: ${releaseId}，现有资产: ${existingAssets.length} 个`);
+      return releaseId;
     }
-    fs.copyFileSync(srcPath, destPath);
-    return true;
   } catch (e) {
-    console.warn(`  ⚠️  复制失败 [${srcPath}]: ${e.message}，将跳过`);
-    return false;
+    // Release 不存在，继续创建
+  }
+
+  // 创建新 Release
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases`,
+      {
+        method: 'POST',
+        headers: { ...githubHeaders(), 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tag_name: RELEASE_TAG,
+          name: 'Media Assets - 图片资源托管',
+          body: '此 Release 由脚本自动创建，用于托管资源图片。请勿手动删除。',
+          draft: false,
+          prerelease: false
+        })
+      }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      releaseId = data.id;
+      existingAssets = [];
+      console.log(`✨ 已创建新 Release [${RELEASE_TAG}]，ID: ${releaseId}`);
+      return releaseId;
+    } else {
+      const err = await res.text();
+      console.error(`❌ 创建 Release 失败: ${err}`);
+      return null;
+    }
+  } catch (e) {
+    console.error(`❌ 创建 Release 异常: ${e.message}`);
+    return null;
   }
 };
 
+// ─── 上传图片到 GitHub Release Assets ────────────────
+const uploadToGitHub = async (localPath, assetName) => {
+  if (!releaseId || !GITHUB_TOKEN) return null;
+
+  // 检查是否已存在同名资产（避免重复上传）
+  const existing = existingAssets.find(a => a.name === assetName);
+  if (existing) {
+    console.log(`  ♻️  图片已存在，复用: ${assetName}`);
+    return existing.browser_download_url;
+  }
+
+  try {
+    const fileBuffer = fs.readFileSync(localPath);
+    const ext = getExtension(assetName);
+    const contentType = ext === '.png' ? 'image/png'
+      : ext === '.webp' ? 'image/webp'
+        : ext === '.gif' ? 'image/gif'
+          : ext === '.svg' ? 'image/svg+xml'
+            : 'image/jpeg';
+
+    const uploadUrl = `https://uploads.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/${releaseId}/assets?name=${encodeURIComponent(assetName)}`;
+
+    const res = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GITHUB_TOKEN}`,
+        'Content-Type': contentType,
+        'Content-Length': fileBuffer.length.toString(),
+        'X-GitHub-Api-Version': '2022-11-28'
+      },
+      body: fileBuffer
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      existingAssets.push(data); // 缓存，避免后续重复查询
+      console.log(`  ✅ 上传成功: ${assetName} → ${data.browser_download_url}`);
+      return data.browser_download_url;
+    } else {
+      const err = await res.text();
+      console.warn(`  ⚠️  上传失败 [${assetName}]: ${err}`);
+      return null;
+    }
+  } catch (e) {
+    console.warn(`  ⚠️  上传异常 [${assetName}]: ${e.message}`);
+    return null;
+  }
+};
+
+// ─── 核心：处理单个图片引用 ──────────────────────────
 const processImage = async (imgRef, resourceSlug, idx, resourceFilePath) => {
-  // 如果已经是 /images/ 公开路径，直接跳过
+  // 网络 URL → 直接保留
+  if (isUrl(imgRef)) return imgRef;
+  // 已是 /images/ 公开路径 → 直接保留
   if (isPublicPath(imgRef)) return imgRef;
 
-  // 为当前资源创建专属子目录
-  const subDir = path.join(PUBLIC_IMAGES_DIR, resourceSlug);
-  if (!fs.existsSync(subDir)) fs.mkdirSync(subDir, { recursive: true });
-
-  if (isUrl(imgRef)) {
-    // 处理网络图片
-    const urlObj = new URL(imgRef);
-    const ext = getExtension(urlObj.pathname, '.jpg'); // 网络图片常无后缀，默认用 .jpg
-    const filename = `img_${idx}${ext}`;
-    const destPath = path.join(subDir, filename);
-    console.log(`  📥 下载图片: ${imgRef}`);
-    const success = await downloadImage(imgRef, destPath);
-    return success ? `/images/${resourceSlug}/${filename}` : imgRef;
-  } else {
-    // 处理本地图片
-    let srcPath = imgRef;
-    if (!path.isAbsolute(imgRef)) {
-      srcPath = path.resolve(path.dirname(resourceFilePath), imgRef);
-    }
-    const ext = getExtension(srcPath, '.png');
-    const filename = `img_${idx}${ext}`;
-    const destPath = path.join(subDir, filename);
-    console.log(`  📂 复制本地图片: ${srcPath}`);
-    const success = copyLocalImage(srcPath, destPath);
-    return success ? `/images/${resourceSlug}/${filename}` : imgRef;
+  // 本地路径 → 上传到 GitHub Release Assets
+  let srcPath = imgRef;
+  if (!path.isAbsolute(imgRef)) {
+    srcPath = path.resolve(path.dirname(resourceFilePath), imgRef);
   }
+
+  if (!fs.existsSync(srcPath)) {
+    console.warn(`  ⚠️  本地文件不存在 [${srcPath}]，保留原始引用`);
+    return imgRef;
+  }
+
+  const ext = getExtension(srcPath, '.png');
+  const assetName = `${resourceSlug}_img_${idx}${ext}`;
+  console.log(`  � 准备上传本地图片: ${srcPath}`);
+
+  const cdnUrl = await uploadToGitHub(srcPath, assetName);
+  return cdnUrl || imgRef; // 上传失败时保留原始路径
 };
 
-// ─── 核心：处理 Markdown 正文中的 ![...](url) 图片引用 ─
+// ─── 核心：处理 Markdown 正文中的 ![...](url) 图片 ──
 const processMarkdownImages = async (content, resourceSlug, resourceFilePath, startIdx) => {
   const imgRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
   let idx = startIdx;
@@ -107,6 +191,11 @@ const processMarkdownImages = async (content, resourceSlug, resourceFilePath, st
 
 // ─── 主流程 ──────────────────────────────────────────
 const generate = async () => {
+  console.log('🚀 开始资源同步...\n');
+
+  // 初始化 GitHub Release
+  await getOrCreateRelease();
+
   const files = fs.readdirSync(RESOURCES_DIR).filter(f => f.endsWith('.md'));
 
   let fileItems = files.map(file => {
@@ -137,29 +226,27 @@ const generate = async () => {
       console.log(`✨ 已为 [${item.file}] 自动分配新 ID: ${currentId}`);
     }
 
-    // 以文件名（去掉 .md）作为资源的 slug，用于子目录名
     const resourceSlug = path.basename(item.file, '.md');
     console.log(`\n🔍 正在处理: [${item.file}]`);
 
-    // ── 1. 处理 gallery 中的图片 ──────────────────────
+    // 1. 处理 gallery 中的图片
     let imgIdx = 0;
     const newGallery = [];
     if (Array.isArray(item.data.gallery)) {
       for (const imgRef of item.data.gallery) {
-        const newPath = await processImage(imgRef, resourceSlug, imgIdx++, item.filePath);
-        newGallery.push(newPath);
+        if (typeof imgRef === 'string') {
+          const newPath = await processImage(imgRef, resourceSlug, imgIdx++, item.filePath);
+          newGallery.push(newPath);
+        }
       }
     }
 
-    // ── 2. 处理正文 Markdown 中的图片 ─────────────────
-    const { content: processedContent, nextIdx } = await processMarkdownImages(
-      item.content,
-      resourceSlug,
-      item.filePath,
-      imgIdx
+    // 2. 处理正文 Markdown 中的图片
+    const { content: processedContent } = await processMarkdownImages(
+      item.content, resourceSlug, item.filePath, imgIdx
     );
 
-    // ── 3. 转换 Markdown 正文为 HTML ──────────────────
+    // 3. 转换 Markdown 正文为 HTML
     const detailHtml = await marked.parse(processedContent);
 
     return {
@@ -183,7 +270,8 @@ const generate = async () => {
 /**
  * 此文件由脚本自动生成，请勿手动修改。
  * 如需更新资源，请修改 /resources 目录下的 Markdown 文件并运行 npm run gen
- * 图片资源（网络URL或本地路径）将自动下载/复制到 public/images/{资源名}/ 目录下
+ * 本地图片会自动上传到 GitHub Release Assets (CDN)
+ * 网络图片 (URL) 将直接保留原始链接
  */
 import { Resource } from '../types';
 
