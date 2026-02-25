@@ -9,7 +9,7 @@ links:
     url: "https://example.com"
 gallery:
   - "https://picsum.photos/seed/gallery1/800/450.jpg"
-  - "D:\wechat_download\xwechat_files\wxid_bk0ni3jweb8r22_8499\temp\InputTemp\8dfa5f0b-1b7d-41db-b08f-54f2e0690812.png"
+  - "D:/wechat_download/xwechat_files/wxid_bk0ni3jweb8r22_8499/temp/InputTemp/8dfa5f0b-1b7d-41db-b08f-54f2e0690812.png"
 ---
 
 ### 1. 网络图片测试
