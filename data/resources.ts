@@ -7,6 +7,28 @@ import { Resource } from '../types';
 
 export const RESOURCES: Resource[] = [
   {
+    "id": 9,
+    "title": "测试资源卡片",
+    "desc": "这是一个通过 Markdown 自动生成的测试卡片。",
+    "category": "技术文档",
+    "date": "2024-06-01",
+    "tags": [
+      "测试",
+      "Demo"
+    ],
+    "links": [
+      {
+        "name": "立即查看",
+        "url": "https://example.com",
+        "code": "1234"
+      }
+    ],
+    "gallery": [
+      "https://picsum.photos/seed/test/800/450"
+    ],
+    "detailHtml": "<h3>测试详情</h3>\n<p>这里是详细介绍内容，支持 <strong>Markdown</strong> 语法。</p>"
+  },
+  {
     "id": 7,
     "title": "Figma 商业级 UI 设计系统 2.0",
     "desc": "包含 2000+ 组件和 500+ 图标的超大型设计系统，完全支持变量功能。",
@@ -53,8 +75,8 @@ export const RESOURCES: Resource[] = [
   },
   {
     "id": 8,
-    "title": "Python test222",
-    "desc": "test test test test222",
+    "title": "Python test1234",
+    "desc": "test test test test1234",
     "category": "视频课程",
     "date": "2024-05-28",
     "tags": [
