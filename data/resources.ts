@@ -7,6 +7,29 @@ import { Resource } from '../types';
 
 export const RESOURCES: Resource[] = [
   {
+    "id": 10,
+    "title": "英雄联盟 (LOL) 战绩查询软件",
+    "desc": "这是一个关联了本地存储图片的测试资源卡片，包含迅雷网盘下载链接。",
+    "category": "游戏资源",
+    "date": "2024-06-01",
+    "tags": [
+      "LOL",
+      "游戏",
+      "测试"
+    ],
+    "links": [
+      {
+        "name": "迅雷网盘",
+        "url": "https://pan.xunlei.com/s/VORuaXsM-n23zT3q-nbpi8NjA1?pwd=xevf",
+        "code": "xevf"
+      }
+    ],
+    "gallery": [
+      "/images/LOL_01.png"
+    ],
+    "detailHtml": "<h3>资源描述</h3>\n<p>这是一份关于 <strong>英雄联盟 (League of Legends)</strong> 战绩查询软件分享资源。</p>\n<h4>包含内容：</h4>\n<ul>\n<li>LOL战绩查询</li>\n<li>基础安装包说明</li>\n<li>提取码验证测试</li>\n</ul>\n<blockquote>\n<p>注意：此资源仅用于网站功能测试。</p>\n</blockquote>"
+  },
+  {
     "id": 9,
     "title": "测试资源卡片",
     "desc": "这是一个通过 Markdown 自动生成的测试卡片。",
