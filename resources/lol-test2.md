@@ -1,15 +1,19 @@
 ---
-title: "英雄联盟 (LOL) 战绩查询软件"
-desc: "这是一个关联了本地存储图片的测试资源卡片，包含迅雷网盘下载链接。"
-category: "游戏资源"
-date: "2024-06-01"
-tags: ["LOL", "游戏", "测试"]
+title: 英雄联盟 (LOL) 战绩查询软件
+desc: 这是一个关联了本地存储图片的测试资源卡片，包含迅雷网盘下载链接。
+category: 游戏资源
+date: '2024-06-01'
+tags:
+  - LOL
+  - 游戏
+  - 测试
 links:
-  - name: "迅雷网盘"
-    url: "https://pan.xunlei.com/s/VORuaXsM-n23zT3q-nbpi8NjA1?pwd=xevf"
-    code: "xevf"
+  - name: 迅雷网盘
+    url: 'https://pan.xunlei.com/s/VORuaXsM-n23zT3q-nbpi8NjA1?pwd=xevf'
+    code: xevf
 gallery:
-  - "/images/LOL_01.png"
+  - /images/LOL_01.png
+id: 11
 ---
 
 ### 资源描述

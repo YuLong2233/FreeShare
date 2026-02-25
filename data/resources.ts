@@ -2,6 +2,7 @@
 /**
  * 此文件由脚本自动生成，请勿手动修改。
  * 如需更新资源，请修改 /resources 目录下的 Markdown 文件并运行 npm run gen
+ * 图片资源（网络URL或本地路径）将自动下载/复制到 public/images/{资源名}/ 目录下
  */
 import { Resource } from '../types';
 
@@ -30,6 +31,52 @@ export const RESOURCES: Resource[] = [
     "detailHtml": "<h3>资源描述</h3>\n<p>这是一份关于 <strong>英雄联盟 (League of Legends)</strong> 战绩查询软件分享资源。</p>\n<h4>包含内容：</h4>\n<ul>\n<li>LOL战绩查询</li>\n<li>基础安装包说明</li>\n<li>提取码验证测试</li>\n</ul>\n<blockquote>\n<p>注意：此资源仅用于网站功能测试。</p>\n</blockquote>"
   },
   {
+    "id": 11,
+    "title": "英雄联盟 (LOL) 战绩查询软件",
+    "desc": "这是一个关联了本地存储图片的测试资源卡片，包含迅雷网盘下载链接。",
+    "category": "游戏资源",
+    "date": "2024-06-01",
+    "tags": [
+      "LOL",
+      "游戏",
+      "测试"
+    ],
+    "links": [
+      {
+        "name": "迅雷网盘",
+        "url": "https://pan.xunlei.com/s/VORuaXsM-n23zT3q-nbpi8NjA1?pwd=xevf",
+        "code": "xevf"
+      }
+    ],
+    "gallery": [
+      "/images/LOL_01.png"
+    ],
+    "detailHtml": "<h3>资源描述</h3>\n<p>这是一份关于 <strong>英雄联盟 (League of Legends)</strong> 战绩查询软件分享资源。</p>\n<h4>包含内容：</h4>\n<ul>\n<li>LOL战绩查询</li>\n<li>基础安装包说明</li>\n<li>提取码验证测试</li>\n</ul>\n<blockquote>\n<p>注意：此资源仅用于网站功能测试。</p>\n</blockquote>"
+  },
+  {
+    "id": 12,
+    "title": "多图片自动化处理测试",
+    "desc": "这是一份用于测试脚本自动下载网络图片及自动迁移本地图片的测试文档。",
+    "category": "技术测试",
+    "date": "2024-06-01",
+    "tags": [
+      "多图测试",
+      "自动化",
+      "脚本"
+    ],
+    "links": [
+      {
+        "name": "示例链接",
+        "url": "https://example.com"
+      }
+    ],
+    "gallery": [
+      "/images/multi-image-test/img_0.jpg",
+      "/images/multi-image-test/img_1.png"
+    ],
+    "detailHtml": "<h3>1. 网络图片测试</h3>\n<p><img src=\"/images/multi-image-test/img_2.png\" alt=\"8dfa5f0b-1b7d-41db-b08f-54f2e0690812\"></p>\n<p>下面这张图片是从网络实时抓取并保存到本地 <code>public/images/</code> 目录下的：</p>\n<p><img src=\"/images/multi-image-test/img_3.jpg\" alt=\"网络示例图\"></p>\n<h3>2. 本地图片测试</h3>\n<p>请将下面的路径替换为您电脑上真实的图片绝对路径。同步后，它会被自动复制到项目的静态资源目录中：</p>\n<p><img src=\"/images/multi-image-test/img_4.png\" alt=\"8dfa5f0b-1b7d-41db-b08f-54f2e0690812\"></p>\n<h3>3. 工作原理说明</h3>\n<p>运行 <code>npm run gen</code> 后：</p>\n<ol>\n<li>脚本会扫描此文件。</li>\n<li>发现 <code>http</code> 开头的链接会尝试 <code>fetch</code> 下载。</li>\n<li>发现本地路径会执行 <code>copy</code> 复制。</li>\n<li>所有图片都会被统一存放在 <code>public/images/multi-image-test/</code> 目录下。</li>\n<li>网页中看到的将全是本地化的路径。</li>\n</ol>"
+  },
+  {
     "id": 9,
     "title": "测试资源卡片",
     "desc": "这是一个通过 Markdown 自动生成的测试卡片。",
@@ -47,7 +94,7 @@ export const RESOURCES: Resource[] = [
       }
     ],
     "gallery": [
-      "https://picsum.photos/seed/test/800/450"
+      "/images/test-demo/img_0.jpg"
     ],
     "detailHtml": "<h3>测试详情</h3>\n<p>这里是详细介绍内容，支持 <strong>Markdown</strong> 语法。</p>"
   },
@@ -69,7 +116,7 @@ export const RESOURCES: Resource[] = [
       }
     ],
     "gallery": [
-      "https://picsum.photos/seed/figma/800/450"
+      "/images/figma-ui-kit/img_0.jpg"
     ],
     "detailHtml": "<h3>资源亮点</h3>\n<p>这是目前市面上最完整的 Figma 商业组件库之一。</p>\n<ul>\n<li><strong>全变量支持</strong>：一键切换深色模式和品牌色。</li>\n<li><strong>响应式布局</strong>：所有组件均采用 Auto Layout 5.0。</li>\n<li><strong>高保真原型</strong>：内置完整的交互逻辑。</li>\n</ul>"
   },
@@ -92,7 +139,7 @@ export const RESOURCES: Resource[] = [
       }
     ],
     "gallery": [
-      "https://picsum.photos/seed/python/800/450"
+      "/images/python-automation/img_0.jpg"
     ],
     "detailHtml": "<h3>课程目录</h3>\n<ol>\n<li>环境搭建与基础语法</li>\n<li>Excel 自动化：Openpyxl 核心技巧</li>\n<li>PDF 提取与合并</li>\n<li>Selenium 网页自动化采集</li>\n<li>实战：自动生成月度报表并发送邮件</li>\n</ol>"
   },
@@ -142,7 +189,7 @@ export const RESOURCES: Resource[] = [
       }
     ],
     "gallery": [
-      "https://picsum.photos/seed/ps/800/450"
+      "/images/adobe-photoshop/img_0.jpg"
     ],
     "detailHtml": "<h3>软件介绍</h3>\n<p>Photoshop 2024 带来了革命性的 <strong>生成式 AI</strong> 技术。</p>\n<h3>本版特性</h3>\n<ol>\n<li><strong>创意填充</strong>：只需选中区域并输入文字，AI 即可为你生成图像。</li>\n<li><strong>移除工具</strong>：一键涂抹即可完美消除画面中的杂物。</li>\n<li><strong>原生支持 Apple Silicon</strong>：在 Mac M1/M2/M3 芯片上极速运行。</li>\n</ol>\n<blockquote>\n<p>请支持正版软件。</p>\n</blockquote>"
   }

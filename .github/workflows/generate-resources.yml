@@ -8,15 +8,15 @@ on:
       - 'resources/**'
       - 'scripts/**'
 
-# 提升权限级别
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   generate:
+    # 🔥 防止 bot 自己触发自己
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
-    # 如果多个任务同时触发，取消之前的，只跑最新的，减少冲突
+
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
@@ -26,14 +26,12 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # 使用默认 token 即可，但显式声明
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          # cache: 'npm'
 
       - name: Install dependencies
         run: npm install
@@ -41,17 +39,22 @@ jobs:
       - name: Run generation script
         run: npm run gen
         env:
-          # 即使脚本暂未用到，也建议注入以防后续逻辑需要
           API_KEY: ${{ secrets.API_KEY }}
 
-      - name: Auto-commit changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "chore: auto-sync resources data"
-          file_pattern: 'data/resources.ts resources/*.md'
-          commit_user_name: github-actions[bot]
-          commit_user_email: github-actions[bot]@users.noreply.github.com
-          # 关键设置：如果检测到远程有新提交，尝试集成
-          push_options: '--force'
-          skip_dirty_check: false    
-          skip_fetch: false          
+      # ✅ 确保和远程同步，避免 push 被拒
+      - name: Rebase latest main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+
+      # ✅ 只有真的有改动才提交
+      - name: Commit and push changes
+        run: |
+          git add data/resources.ts resources/*.md || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: auto-sync resources data"
+            git push origin main
+          fi
