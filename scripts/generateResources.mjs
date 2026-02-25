@@ -17,6 +17,10 @@ const GITHUB_OWNER = process.env.GITHUB_OWNER || 'YuLong2233';
 const GITHUB_REPO = process.env.GITHUB_REPO || 'FreeShare';
 const RELEASE_TAG = 'media';
 
+// CLI 参数解析
+const ARGS = process.argv.slice(2);
+const CLEAN_MODE = ARGS.includes('--clean');
+
 // 确保目录存在
 if (!fs.existsSync(RESOURCES_DIR)) fs.mkdirSync(RESOURCES_DIR, { recursive: true });
 
@@ -290,6 +294,94 @@ export const RESOURCES: Resource[] = ${JSON.stringify(processedResources, null, 
 
   fs.writeFileSync(OUTPUT_FILE, tsContent, 'utf8');
   console.log(`\n✅ 成功！已同步 ${processedResources.length} 个资源到 ${OUTPUT_FILE}`);
+
+  // ── 孤儿资源清理（仅在 --clean 模式下执行）──────────
+  if (CLEAN_MODE && releaseId && GITHUB_TOKEN) {
+    console.log('\n🧹 正在检测孤儿图片资产...');
+
+    // 收集所有 .md 文件中实际引用的 Release 图片文件名
+    const usedAssetNames = new Set();
+    const releaseUrlPrefix = `https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases/download/${RELEASE_TAG}/`;
+
+    for (const res of processedResources) {
+      // 从 gallery
+      for (const url of res.gallery) {
+        if (typeof url === 'string' && url.startsWith(releaseUrlPrefix)) {
+          usedAssetNames.add(url.replace(releaseUrlPrefix, ''));
+        }
+      }
+      // 从 detailHtml 中提取
+      const htmlImgRegex = /src="([^"]*)"/g;
+      let htmlMatch;
+      while ((htmlMatch = htmlImgRegex.exec(res.detailHtml)) !== null) {
+        const src = htmlMatch[1];
+        if (src.startsWith(releaseUrlPrefix)) {
+          usedAssetNames.add(src.replace(releaseUrlPrefix, ''));
+        }
+      }
+    }
+
+    // 刷新 Release 资产列表
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/${releaseId}/assets?per_page=100`,
+        { headers: githubHeaders() }
+      );
+      if (res.ok) {
+        const allAssets = await res.json();
+        const orphans = allAssets.filter(a => !usedAssetNames.has(a.name));
+
+        if (orphans.length === 0) {
+          console.log('  ✨ 没有发现孤儿资产，一切干净！');
+        } else {
+          console.log(`  🗑️  发现 ${orphans.length} 个孤儿资产，正在删除...`);
+          for (const orphan of orphans) {
+            try {
+              const delRes = await fetch(
+                `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/assets/${orphan.id}`,
+                { method: 'DELETE', headers: githubHeaders() }
+              );
+              if (delRes.ok || delRes.status === 204) {
+                console.log(`    ❌ 已删除: ${orphan.name} (${(orphan.size / 1024).toFixed(1)} KB)`);
+              } else {
+                console.warn(`    ⚠️  删除失败: ${orphan.name}`);
+              }
+            } catch (e) {
+              console.warn(`    ⚠️  删除异常: ${orphan.name}: ${e.message}`);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      console.warn(`  ⚠️  获取资产列表失败: ${e.message}`);
+    }
+  }
+
+  // ── 显示存储空间统计 ────────────────────────────────
+  if (releaseId && GITHUB_TOKEN) {
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/${releaseId}/assets?per_page=100`,
+        { headers: githubHeaders() }
+      );
+      if (res.ok) {
+        const assets = await res.json();
+        let totalSize = 0;
+        assets.forEach(a => totalSize += a.size);
+        const usedMB = (totalSize / 1024 / 1024).toFixed(2);
+        const limitMB = 500;
+        const percent = (totalSize / 1024 / 1024 / limitMB * 100).toFixed(1);
+        const bar = '█'.repeat(Math.round(percent / 5)) + '░'.repeat(20 - Math.round(percent / 5));
+
+        console.log(`\n📊 GitHub Release CDN 存储统计:`);
+        console.log(`  文件数量: ${assets.length} 个`);
+        console.log(`  已使用:   ${usedMB} MB / ${limitMB} MB (${percent}%)`);
+        console.log(`  [${bar}]`);
+      }
+    } catch (e) {
+      console.warn(`  ⚠️  获取存储统计失败: ${e.message}`);
+    }
+  }
 };
 
 generate();
