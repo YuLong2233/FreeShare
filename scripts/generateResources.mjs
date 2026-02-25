@@ -246,7 +246,17 @@ const generate = async () => {
       item.content, resourceSlug, item.filePath, imgIdx
     );
 
-    // 3. 转换 Markdown 正文为 HTML
+    // 3. 回写 .md 文件：将本地路径永久替换为 CDN 地址
+    const galleryChanged = JSON.stringify(item.data.gallery) !== JSON.stringify(newGallery);
+    const contentChanged = item.content !== processedContent;
+    if (galleryChanged || contentChanged) {
+      item.data.gallery = newGallery;
+      const updatedMd = matter.stringify(processedContent, item.data);
+      fs.writeFileSync(item.filePath, updatedMd, 'utf8');
+      console.log(`  📝 已回写 .md 文件，本地路径已替换为 CDN 地址`);
+    }
+
+    // 4. 转换 Markdown 正文为 HTML
     const detailHtml = await marked.parse(processedContent);
 
     return {

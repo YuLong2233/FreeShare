@@ -13,13 +13,13 @@ links:
 gallery:
   - 'https://picsum.photos/seed/gallery1/800/450.jpg'
   - >-
-    D:/wechat_download/xwechat_files/wxid_bk0ni3jweb8r22_8499/temp/InputTemp/8dfa5f0b-1b7d-41db-b08f-54f2e0690812.png
+    https://github.com/YuLong2233/FreeShare/releases/download/media/multi-image-test_img_1.png
 id: 12
 ---
 
 ### 1. 网络图片测试
 
-![8dfa5f0b-1b7d-41db-b08f-54f2e0690812](D:\wechat_download\xwechat_files\wxid_bk0ni3jweb8r22_8499\temp\InputTemp\8dfa5f0b-1b7d-41db-b08f-54f2e0690812.png)
+![8dfa5f0b-1b7d-41db-b08f-54f2e0690812](https://github.com/YuLong2233/FreeShare/releases/download/media/multi-image-test_img_2.png)
 
 下面这张图片是从网络实时抓取并保存到本地 `public/images/` 目录下的：
 
@@ -28,7 +28,7 @@ id: 12
 ### 2. 本地图片测试
 请将下面的路径替换为您电脑上真实的图片绝对路径。同步后，它会被自动复制到项目的静态资源目录中：
 
-![8dfa5f0b-1b7d-41db-b08f-54f2e0690812](D:\wechat_download\xwechat_files\wxid_bk0ni3jweb8r22_8499\temp\InputTemp\8dfa5f0b-1b7d-41db-b08f-54f2e0690812.png)
+![8dfa5f0b-1b7d-41db-b08f-54f2e0690812](https://github.com/YuLong2233/FreeShare/releases/download/media/multi-image-test_img_4.png)
 
 ### 3. 工作原理说明
 运行 `npm run gen` 后：

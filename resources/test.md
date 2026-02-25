@@ -1,16 +1,20 @@
 ---
-title: "Python test1234"
-desc: "test test test test1234"
-category: "视频课程"
-date: "2024-05-28"
-tags: ["Python", "自动化", "办公技巧"]
+title: Python test1234
+desc: test test test test1234
+category: 视频课程
+date: '2024-05-28'
+tags:
+  - Python
+  - 自动化
+  - 办公技巧
 links:
-  - name: "课程视频"
-    url: "https://pan.baidu.com/s/python_auto"
-    code: "py66"
-    gallery:
-  - "https://picsum.photos/seed/python/800/450"
+  - name: 课程视频
+    url: 'https://pan.baidu.com/s/python_auto'
+    code: py66
+    gallery: null
+  - 'https://picsum.photos/seed/python/800/450'
 id: 8
+gallery: []
 ---
 
 ### 课程目录
