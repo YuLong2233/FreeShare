@@ -9,6 +9,34 @@ import { Resource } from '../types';
 
 export const RESOURCES: Resource[] = [
   {
+    "id": 12,
+    "title": "LOL查战绩软件LeagueAkari",
+    "desc": "LOL(英雄联盟)查战绩软件",
+    "category": "游戏资源",
+    "date": "2026-02-07",
+    "tags": [
+      "LOL查战绩软件",
+      "自动化",
+      "脚本"
+    ],
+    "links": [
+      {
+        "name": "迅雷下载",
+        "url": "https://pan.xunlei.com/s/VORuaXsM-n23zT3q-nbpi8NjA1?pwd=xevf",
+        "code": "xevf"
+      },
+      {
+        "name": "夸克下载",
+        "url": "https://pan.quark.cn/s/5c96171b1be4"
+      }
+    ],
+    "gallery": [
+      "https://i.postimg.cc/XYwfnNVj/wei-xin-tu-pian-20250428231701.png",
+      "https://github.com/YuLong2233/FreeShare/releases/download/media/multi-image-test_img_1.png"
+    ],
+    "detailHtml": "<h3>1. 软件展示</h3>\n<p><img src=\"https://github.com/YuLong2233/FreeShare/releases/download/media/LOL_LeagueAkari_img_2.png\" alt=\"微信图片_20250428231701\"></p>\n<p><img src=\"https://github.com/YuLong2233/FreeShare/releases/download/media/LOL_LeagueAkari_img_3.png\" alt=\"微信图片_20250428231707\"></p>\n<p><img src=\"https://github.com/YuLong2233/FreeShare/releases/download/media/LOL_LeagueAkari_img_4.png\" alt=\"微信图片_20250428202536\"></p>\n<h3>2. 软件说明</h3>\n<p>产品亮点：\n大主播推荐：小超梦、小柴剑魔等知名主播均在使用，质量保证！\n客户端插件：安全可靠，不会封号（只用查战绩功能，不用其他功能，本人实测1年多从未封号）。</p>\n<p>战绩查询功能：\n同大区召唤师战绩查询：轻松查看同大区玩家的战绩数据。\n自动查询队友战绩：进入对局后，自动查询五个队友的战绩。\n自动查询对手战绩：进入游戏后，自动查询五个对手的战绩。</p>\n<p>其他辅助功能：\n自动接受对局：找到对局后自动接受，节省时间。\n自动禁用/选择英雄：智能禁用或选择英雄，提升游戏体验。</p>\n<h3>3. 原始连接</h3>\n<p>原作者连接：<a href=\"https://github.com/LeagueAkari/LeagueAkari\">https://github.com/LeagueAkari/LeagueAkari</a></p>\n<p>github地址，有条件的宝子可以去github找到原作者支持一下（ps：国内访问不稳定）</p>"
+  },
+  {
     "id": 10,
     "title": "英雄联盟 (LOL) 战绩查询软件",
     "desc": "这是一个关联了本地存储图片的测试资源卡片，包含迅雷网盘下载链接。",
@@ -53,29 +81,6 @@ export const RESOURCES: Resource[] = [
       "/images/LOL_01.png"
     ],
     "detailHtml": "<h3>资源描述</h3>\n<p>这是一份关于 <strong>英雄联盟 (League of Legends)</strong> 战绩查询软件分享资源。</p>\n<h4>包含内容：</h4>\n<ul>\n<li>LOL战绩查询</li>\n<li>基础安装包说明</li>\n<li>提取码验证测试</li>\n</ul>\n<blockquote>\n<p>注意：此资源仅用于网站功能测试。</p>\n</blockquote>"
-  },
-  {
-    "id": 12,
-    "title": "多图片自动化处理测试",
-    "desc": "这是一份用于测试脚本自动下载网络图片及自动迁移本地图片的测试文档。",
-    "category": "技术测试",
-    "date": "2024-06-01",
-    "tags": [
-      "多图测试",
-      "自动化",
-      "脚本"
-    ],
-    "links": [
-      {
-        "name": "示例链接",
-        "url": "https://example.com"
-      }
-    ],
-    "gallery": [
-      "https://picsum.photos/seed/gallery1/800/450.jpg",
-      "https://github.com/YuLong2233/FreeShare/releases/download/media/multi-image-test_img_1.png"
-    ],
-    "detailHtml": "<h3>1. 网络图片测试</h3>\n<p><img src=\"https://github.com/YuLong2233/FreeShare/releases/download/media/multi-image-test_img_2.png\" alt=\"8dfa5f0b-1b7d-41db-b08f-54f2e0690812\"></p>\n<p>下面这张图片是从网络实时抓取并保存到本地 <code>public/images/</code> 目录下的：</p>\n<p><img src=\"https://picsum.photos/seed/markdown1/800/450.jpg\" alt=\"网络示例图\"></p>\n<h3>2. 本地图片测试</h3>\n<p>请将下面的路径替换为您电脑上真实的图片绝对路径。同步后，它会被自动复制到项目的静态资源目录中：</p>\n<p><img src=\"https://github.com/YuLong2233/FreeShare/releases/download/media/multi-image-test_img_4.png\" alt=\"8dfa5f0b-1b7d-41db-b08f-54f2e0690812\"></p>\n<h3>3. 工作原理说明</h3>\n<p>运行 <code>npm run gen</code> 后：</p>\n<ol>\n<li>脚本会扫描此文件。</li>\n<li>发现 <code>http</code> 开头的链接会尝试 <code>fetch</code> 下载。</li>\n<li>发现本地路径会执行 <code>copy</code> 复制。</li>\n<li>所有图片都会被统一存放在 <code>public/images/multi-image-test/</code> 目录下。</li>\n<li>网页中看到的将全是本地化的路径。</li>\n</ol>"
   },
   {
     "id": 9,
