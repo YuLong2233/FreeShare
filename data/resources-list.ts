@@ -8,6 +8,32 @@ import { Resource } from '../types';
 
 export const RESOURCES: Resource[] = [
   {
+    "id": 14,
+    "title": "微信多开防撤回(windows版)BetterWX",
+    "desc": "微信多开防撤回(windows版)BetterWX",
+    "category": "办公软件",
+    "date": "2026-02-27",
+    "tags": [
+      "微信多开软件",
+      "自动化",
+      "脚本"
+    ],
+    "links": [
+      {
+        "name": "迅雷网盘",
+        "url": "https://pan.xunlei.com/s/VOmTJsSU4DHt-pSAvJWUDT8KA1?pwd=bdtj#"
+      },
+      {
+        "name": "夸克网盘",
+        "url": "https://pan.quark.cn/s/d7646d51f882"
+      }
+    ],
+    "gallery": [
+      "https://i.postimg.cc/Kz4nd7VB/微信图片_20250525211245.png",
+      "https://github.com/YuLong2233/FreeShare/releases/download/media/_img_1.png"
+    ]
+  },
+  {
     "id": 12,
     "title": "LOL查战绩软件LeagueAkari",
     "desc": "LOL(英雄联盟)查战绩软件",
@@ -79,6 +105,31 @@ export const RESOURCES: Resource[] = [
     ],
     "gallery": [
       "https://picsum.photos/seed/ps/800/450"
+    ]
+  },
+  {
+    "id": 13,
+    "title": "示例：资源标题",
+    "desc": "一句话概括资源的亮点",
+    "category": "办公软件",
+    "date": "2024-02-27",
+    "tags": [
+      "标签1",
+      "标签2"
+    ],
+    "links": [
+      {
+        "name": "迅雷网盘",
+        "url": "https://pan.xunlei.com/...",
+        "code": "abcd"
+      },
+      {
+        "name": "夸克网盘",
+        "url": "https://pan.quark.cn/..."
+      }
+    ],
+    "gallery": [
+      "https://picsum.photos/seed/1/800/450.jpg"
     ]
   }
 ];
