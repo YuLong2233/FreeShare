@@ -24,13 +24,21 @@ id: 12
 
 这是一份关于 ***\*英雄联盟 (League of Legends)\**** 战绩查询软件分享资源。
 
+
+
 ### 1. 软件展示
 
 ![微信图片_20250428231701](https://github.com/YuLong2233/FreeShare/releases/download/media/LOL_LeagueAkari_img_2.png)
 
+
+
 ![微信图片_20250428231707](https://github.com/YuLong2233/FreeShare/releases/download/media/LOL_LeagueAkari_img_3.png)
 
+
+
 ![微信图片_20250428202536](https://github.com/YuLong2233/FreeShare/releases/download/media/LOL_LeagueAkari_img_4.png)
+
+
 
 ### 2. 软件说明
 
@@ -46,6 +54,8 @@ id: 12
 其他辅助功能：
 自动接受对局：找到对局后自动接受，节省时间。
 自动禁用/选择英雄：智能禁用或选择英雄，提升游戏体验。
+
+
 
 ### 3. 原始连接
 原作者连接：https://github.com/LeagueAkari/LeagueAkari
