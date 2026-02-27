@@ -2,17 +2,42 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { Search, Sparkles, BookOpen, Download, Github, Menu, X, Rocket, Info, ChevronRight, BrainCircuit, Loader2, ArrowLeft, ExternalLink, Copy, Check, Zap, ChevronLeft } from 'lucide-react';
-import { RESOURCES } from './data/resources';
+import { RESOURCES } from './data/resources-list';
 import { ResourceCard } from './components/ResourceCard';
-import { Resource } from './types';
+import { Resource, ResourceDetail } from './types';
 import { findResourcesWithAi } from './services/geminiService';
 
 // --- 资源详情页 ---
 const ResourceDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const resource = RESOURCES.find(r => r.id === Number(id));
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [detail, setDetail] = useState<ResourceDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(true);
+  const [detailError, setDetailError] = useState(false);
+
+  // 从轻量列表中找到基础信息
+  const resource = RESOURCES.find(r => r.id === Number(id));
+
+  // 按需动态加载详情 JSON
+  useEffect(() => {
+    if (!resource) return;
+    setDetailLoading(true);
+    setDetailError(false);
+    fetch(`/data/details/${resource.id}.json`)
+      .then(res => {
+        if (!res.ok) throw new Error('Not found');
+        return res.json();
+      })
+      .then((data: ResourceDetail) => {
+        setDetail(data);
+        setDetailLoading(false);
+      })
+      .catch(() => {
+        setDetailError(true);
+        setDetailLoading(false);
+      });
+  }, [resource?.id]);
 
   if (!resource) {
     return (
@@ -29,9 +54,12 @@ const ResourceDetailPage = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  // 详情页使用 detail 中的 gallery（更完整），列表的 gallery 仅用于卡片封面
+  const displayGallery = detail?.gallery ?? resource.gallery ?? [];
+
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto">
-      <button 
+      <button
         onClick={() => navigate('/downloads')}
         className="mb-8 flex items-center gap-2 text-gray-500 hover:text-indigo-600 transition-colors font-medium"
       >
@@ -52,15 +80,15 @@ const ResourceDetailPage = () => {
             </p>
           </header>
 
-          {resource.gallery && resource.gallery.length > 0 && (
+          {displayGallery.length > 0 && (
             <div className="space-y-4">
               <h2 className="text-lg font-bold flex items-center gap-2">展示截图</h2>
               <div className="grid grid-cols-1 gap-4">
-                {resource.gallery.map((img, idx) => (
-                  <img 
-                    key={idx} 
-                    src={img} 
-                    alt={`Preview ${idx}`} 
+                {displayGallery.map((img, idx) => (
+                  <img
+                    key={idx}
+                    src={img}
+                    alt={`Preview ${idx}`}
                     className="w-full rounded-2xl shadow-lg object-cover"
                   />
                 ))}
@@ -69,11 +97,22 @@ const ResourceDetailPage = () => {
           )}
 
           <div className="prose prose-indigo dark:prose-invert max-w-none">
-            <h2 className="text-lg font-bold flex items-center gap-2 mb-4">详细介绍 & 使用指南</h2>
-            <div 
-              className="bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: resource.detailHtml || '<p>暂无详细介绍。</p>' }} 
-            />
+            <h2 className="text-lg font-bold flex items-center gap-2 mb-4">详细介绍 &amp; 使用指南</h2>
+            {detailLoading ? (
+              <div className="flex items-center gap-3 py-12 justify-center text-gray-400">
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>加载详情中...</span>
+              </div>
+            ) : detailError ? (
+              <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm text-gray-500">
+                暂无详细介绍。
+              </div>
+            ) : (
+              <div
+                className="bg-white dark:bg-gray-800 p-8 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: detail?.detailHtml || '<p>暂无详细介绍。</p>' }}
+              />
+            )}
           </div>
         </div>
 
@@ -92,7 +131,7 @@ const ResourceDetailPage = () => {
                           className="flex items-center justify-between w-full px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl transition-colors text-xs font-mono"
                         >
                           <span className="flex items-center gap-2">
-                             提取码: {link.code}
+                            提取码: {link.code}
                           </span>
                           {copiedId === link.name ? (
                             <Check className="w-3 h-3" />
@@ -149,8 +188,8 @@ const HomePage = () => (
               <Rocket className="w-5 h-5 group-hover:rotate-12 transition-transform" />
               探索资源库
             </Link>
-            <Link 
-              to="/guide" 
+            <Link
+              to="/guide"
               className="w-full sm:w-auto px-8 py-4 bg-white text-gray-700 border border-gray-200 rounded-2xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
             >
               <BookOpen className="w-5 h-5 text-gray-400" />
@@ -162,23 +201,23 @@ const HomePage = () => (
         <div className="relative flex justify-center lg:justify-end pr-0 lg:pr-12">
           <div className="absolute -top-12 -right-12 w-64 h-64 bg-indigo-100 rounded-full blur-[80px] opacity-40 -z-10"></div>
           <div className="absolute -bottom-12 -left-12 w-64 h-64 bg-violet-100 rounded-full blur-[80px] opacity-40 -z-10"></div>
-          
+
           <div className="relative w-full max-w-[540px] animate-bounce-slow">
             <div className="rounded-[2.5rem] bg-white p-3 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.12)] border border-gray-100 overflow-hidden">
-               <img
+              <img
                 src="https://picsum.photos/seed/freeshare_pro/1000/750"
                 alt="应用预览"
                 className="w-full h-auto rounded-[2rem] shadow-inner"
               />
             </div>
             <div className="absolute -right-4 bottom-12 sm:-right-8 bg-white/95 backdrop-blur p-5 rounded-2xl shadow-2xl border border-indigo-50 hidden sm:flex items-center gap-4">
-               <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
-                 <Zap className="w-6 h-6 text-white" />
-               </div>
-               <div>
-                 <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Security</div>
-                 <div className="text-base font-black text-gray-900">100% 验证通过</div>
-               </div>
+              <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
+                <Zap className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Security</div>
+                <div className="text-base font-black text-gray-900">100% 验证通过</div>
+              </div>
             </div>
           </div>
         </div>
@@ -209,7 +248,7 @@ const DownloadsPage = () => {
   const [activeCat, setActiveCat] = useState('全部');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResultIds, setAiResultIds] = useState<number[] | null>(null);
-  
+
   // 分页状态
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 6;
@@ -227,8 +266,8 @@ const DownloadsPage = () => {
       list = list.filter(r => aiResultIds.includes(r.id));
     }
     return list.filter(item => {
-      const matchSearch = item.title.toLowerCase().includes(search.toLowerCase()) || 
-                          item.desc.toLowerCase().includes(search.toLowerCase());
+      const matchSearch = item.title.toLowerCase().includes(search.toLowerCase()) ||
+        item.desc.toLowerCase().includes(search.toLowerCase());
       const matchCat = activeCat === '全部' || item.category === activeCat;
       return matchSearch && matchCat;
     });
@@ -285,11 +324,10 @@ const DownloadsPage = () => {
             <button
               key={cat}
               onClick={() => { setActiveCat(cat); setAiResultIds(null); }}
-              className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
-                activeCat === cat 
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25' 
+              className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${activeCat === cat
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/25'
                 : 'bg-white text-gray-500 border border-gray-100 hover:bg-gray-50'
-              }`}
+                }`}
             >
               {cat}
             </button>
@@ -339,7 +377,7 @@ const DownloadsPage = () => {
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
-              
+
               <div className="flex items-center gap-1">
                 {Array.from({ length: totalPages }).map((_, idx) => {
                   const pageNum = idx + 1;
@@ -347,11 +385,10 @@ const DownloadsPage = () => {
                     <button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
-                      className={`w-11 h-11 rounded-xl text-sm font-bold transition-all ${
-                        currentPage === pageNum
+                      className={`w-11 h-11 rounded-xl text-sm font-bold transition-all ${currentPage === pageNum
                         ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 scale-110'
                         : 'bg-white border border-gray-200 text-gray-500 hover:bg-gray-50'
-                      }`}
+                        }`}
                     >
                       {pageNum}
                     </button>
@@ -442,9 +479,8 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`text-sm font-bold tracking-tight transition-colors flex items-center gap-2 ${
-                    location.pathname === link.path ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'
-                  }`}
+                  className={`text-sm font-bold tracking-tight transition-colors flex items-center gap-2 ${location.pathname === link.path ? 'text-indigo-600' : 'text-gray-500 hover:text-indigo-600'
+                    }`}
                 >
                   <link.icon className="w-4 h-4 opacity-50" />
                   {link.name}

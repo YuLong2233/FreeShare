@@ -51,7 +51,7 @@ jobs:
       # ✅ 只有真的有改动才提交
       - name: Commit and push changes
         run: |
-          git add data/resources.ts resources/*.md || true
+          git add data/resources-list.ts "public/data/details/*.json" resources/*.md || true
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else

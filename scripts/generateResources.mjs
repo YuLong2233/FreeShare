@@ -9,7 +9,8 @@ import dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
 const RESOURCES_DIR = './resources';
-const OUTPUT_FILE = './data/resources.ts';
+const OUTPUT_LIST_FILE = './data/resources-list.ts'; // 轻量列表文件
+const DETAILS_DIR = './public/data/details';           // 详情 JSON 目录
 
 // GitHub 配置
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
@@ -23,6 +24,7 @@ const CLEAN_MODE = ARGS.includes('--clean');
 
 // 确保目录存在
 if (!fs.existsSync(RESOURCES_DIR)) fs.mkdirSync(RESOURCES_DIR, { recursive: true });
+if (!fs.existsSync(DETAILS_DIR)) fs.mkdirSync(DETAILS_DIR, { recursive: true });
 
 // ─── 工具函数 ────────────────────────────────────────
 const isUrl = (str) => /^https?:\/\//i.test(str);
@@ -272,28 +274,39 @@ const generate = async () => {
       tags: item.data.tags || [],
       links: item.data.links || [],
       gallery: newGallery,
-      detailHtml: detailHtml.trim()
+      detailHtml: detailHtml.trim()   // 临时保留，输出时会分离
     };
   }));
 
   // 按日期降序排序
   processedResources.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  // 生成 TypeScript 文件
-  const tsContent = `
+  // ── 1. 生成轻量列表文件（不含 detailHtml）─────────────
+  const listData = processedResources.map(({ detailHtml, ...rest }) => rest);
+  const listTsContent = `
 /**
  * 此文件由脚本自动生成，请勿手动修改。
- * 如需更新资源，请修改 /resources 目录下的 Markdown 文件并运行 npm run gen
- * 本地图片会自动上传到 GitHub Release Assets (CDN)
- * 网络图片 (URL) 将直接保留原始链接
+ * 仅含列表展示所需的轻量字段，不含 detailHtml。
+ * 详情内容在 public/data/details/{id}.json 中按需加载。
  */
 import { Resource } from '../types';
 
-export const RESOURCES: Resource[] = ${JSON.stringify(processedResources, null, 2)};
+export const RESOURCES: Resource[] = ${JSON.stringify(listData, null, 2)};
 `;
+  fs.writeFileSync(OUTPUT_LIST_FILE, listTsContent, 'utf8');
 
-  fs.writeFileSync(OUTPUT_FILE, tsContent, 'utf8');
-  console.log(`\n✅ 成功！已同步 ${processedResources.length} 个资源到 ${OUTPUT_FILE}`);
+  // ── 2. 为每个资源写入独立的详情 JSON 文件 ────────────
+  for (const res of processedResources) {
+    const detailJson = JSON.stringify({
+      detailHtml: res.detailHtml,
+      gallery: res.gallery
+    }, null, 2);
+    fs.writeFileSync(path.join(DETAILS_DIR, `${res.id}.json`), detailJson, 'utf8');
+  }
+
+  console.log(`\n✅ 成功！已同步 ${processedResources.length} 个资源`);
+  console.log(`   列表文件: ${OUTPUT_LIST_FILE}`);
+  console.log(`   详情文件: ${DETAILS_DIR}/{id}.json (共 ${processedResources.length} 个)`);
 
   // ── 孤儿资源清理（仅在 --clean 模式下执行）──────────
   if (CLEAN_MODE && releaseId && GITHUB_TOKEN) {

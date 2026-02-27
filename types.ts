@@ -5,6 +5,7 @@ export interface Link {
   code?: string;
 }
 
+// 列表页使用的轻量数据（不含 detailHtml，可含首图）
 export interface Resource {
   id: number;
   title: string;
@@ -13,9 +14,13 @@ export interface Resource {
   date: string;
   links: Link[];
   tags?: string[];
-  // 新增字段
-  detailHtml?: string; // 详细介绍的 HTML 内容
-  gallery?: string[];  // 详情页展示的图片 URL 数组
+  gallery?: string[];   // 保留用于卡片封面图展示
+}
+
+// 详情页动态加载的数据
+export interface ResourceDetail {
+  detailHtml: string;
+  gallery?: string[];
 }
 
 export type View = 'home' | 'downloads' | 'guide';
