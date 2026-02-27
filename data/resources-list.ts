@@ -29,8 +29,7 @@ export const RESOURCES: Resource[] = [
       }
     ],
     "gallery": [
-      "https://i.postimg.cc/Kz4nd7VB/微信图片_20250525211245.png",
-      "https://github.com/YuLong2233/FreeShare/releases/download/media/_img_1.png"
+      "https://i.postimg.cc/Kz4nd7VB/微信图片_20250525211245.png"
     ]
   },
   {

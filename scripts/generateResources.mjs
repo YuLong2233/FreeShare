@@ -64,7 +64,23 @@ const getOrCreateRelease = async () => {
     if (res.ok) {
       const data = await res.json();
       releaseId = data.id;
-      existingAssets = data.assets || [];
+
+      // 🚨 获取所有资产（处理分页）
+      let allAssets = [];
+      let page = 1;
+      while (true) {
+        const assetsRes = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/${releaseId}/assets?per_page=100&page=${page}`,
+          { headers: githubHeaders() }
+        );
+        if (assetsRes.ok) {
+          const pageAssets = await assetsRes.json();
+          if (pageAssets.length === 0) break;
+          allAssets = allAssets.concat(pageAssets);
+          page++;
+        } else break;
+      }
+      existingAssets = allAssets;
       console.log(`📦 已找到 Release [${RELEASE_TAG}]，ID: ${releaseId}，现有资产: ${existingAssets.length} 个`);
       return releaseId;
     }
@@ -144,8 +160,25 @@ const uploadToGitHub = async (localPath, assetName) => {
       console.log(`  ✅ 上传成功: ${assetName} → ${data.browser_download_url}`);
       return data.browser_download_url;
     } else {
-      const err = await res.text();
-      console.warn(`  ⚠️  上传失败 [${assetName}]: ${err}`);
+      const errText = await res.text();
+      // 🚨 如果 GitHub 返回已存在，尝试从现有列表中找回它的 URL（有时缓存失效可能导致此情况）
+      if (errText.includes('already_exists')) {
+        console.log(`  ♻️  GitHub 反馈已存在: ${assetName}，正在尝试修复引用...`);
+        // 重新抓取一次资产列表确保最新
+        const refreshRes = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/${releaseId}/assets?per_page=100`,
+          { headers: githubHeaders() }
+        );
+        if (refreshRes.ok) {
+          const latestAssets = await refreshRes.json();
+          const found = latestAssets.find(a => a.name === assetName);
+          if (found) {
+            existingAssets.push(found);
+            return found.browser_download_url;
+          }
+        }
+      }
+      console.warn(`  ⚠️  上传失败 [${assetName}]: ${errText}`);
       return null;
     }
   } catch (e) {
@@ -173,8 +206,10 @@ const processImage = async (imgRef, resourceSlug, idx, resourceFilePath) => {
   }
 
   const ext = getExtension(srcPath, '.png');
-  const assetName = `${resourceSlug}_img_${idx}${ext}`;
-  console.log(`  � 准备上传本地图片: ${srcPath}`);
+  // 🚨 清洗 slug，去掉非 ASCII 字符，避免 GitHub CDN 链接中文字符丢失导致的同步失效
+  const safeSlug = resourceSlug.replace(/[^\x00-\x7F]/g, '').replace(/\s+/g, '_') || 'img';
+  const assetName = `${safeSlug}_img_${idx}${ext}`;
+  console.log(`  📂 准备上传本地图片: ${srcPath}`);
 
   const cdnUrl = await uploadToGitHub(srcPath, assetName);
   return cdnUrl || imgRef; // 上传失败时保留原始路径
