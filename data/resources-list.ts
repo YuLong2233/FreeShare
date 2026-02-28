@@ -60,27 +60,6 @@ export const RESOURCES: Resource[] = [
     ]
   },
   {
-    "id": 9,
-    "title": "测试资源卡片",
-    "desc": "这是一个通过 Markdown 自动生成的测试卡片。",
-    "category": "技术文档",
-    "date": "2024-06-01",
-    "tags": [
-      "测试",
-      "Demo"
-    ],
-    "links": [
-      {
-        "name": "立即查看",
-        "url": "https://example.com",
-        "code": "1234"
-      }
-    ],
-    "gallery": [
-      "https://picsum.photos/seed/test/800/450"
-    ]
-  },
-  {
     "id": 6,
     "title": "Adobe Photoshop 2024 完整版",
     "desc": "全球最强大的图像处理软件，内置最新的 AI 创意填充功能。",
@@ -104,6 +83,30 @@ export const RESOURCES: Resource[] = [
     ],
     "gallery": [
       "https://picsum.photos/seed/ps/800/450"
+    ]
+  },
+  {
+    "id": 15,
+    "title": "Windows C盘深度清理工具",
+    "desc": "基于 Python 构建的现代化 C 盘深度清理工具，支持深色模式与中英双语，一键释放磁盘空间",
+    "category": "系统工具",
+    "date": "2024-02-28",
+    "tags": [
+      "Windows",
+      "系统清理"
+    ],
+    "links": [
+      {
+        "name": "迅雷网盘",
+        "url": "https://pan.xunlei.com/s/VOmZJIW4zOBhwFsdJsaptZiaA1?pwd=ev56#"
+      },
+      {
+        "name": "夸克网盘",
+        "url": "https://pan.quark.cn/s/3df15629ca3e"
+      }
+    ],
+    "gallery": [
+      "https://i.postimg.cc/FRvxDNYN/wei-xin-tu-pian-20260228142814-239-902.png"
     ]
   },
   {
