@@ -254,6 +254,16 @@ const DownloadsPage = () => {
   const ITEMS_PER_PAGE = 6;
   const listTopRef = useRef<HTMLDivElement>(null);
 
+  // 加载 Google 广告
+  useEffect(() => {
+    try {
+      // @ts-ignore
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    } catch (e) {
+      console.error('AdSense error:', e);
+    }
+  }, []);
+
   const categories = useMemo(() => {
     const cats = new Set(RESOURCES.map(r => r.category));
     return ['全部', ...Array.from(cats)];
@@ -358,6 +368,17 @@ const DownloadsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* 💡 广告位 (搜索栏下方) */}
+      <div className="mb-12 overflow-hidden rounded-3xl bg-white/50 backdrop-blur-sm p-6 border border-gray-100 shadow-sm">
+        <ins className="adsbygoogle"
+          style={{ display: 'block' }}
+          data-ad-client="ca-pub-4626143061930673"
+          data-ad-slot="2685968811"
+          data-ad-format="auto"
+          data-full-width-responsive="true"></ins>
+      </div>
+
 
       {currentItems.length > 0 ? (
         <>
