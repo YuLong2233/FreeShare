@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# === 自动生成的数据文件（构建时动态生成，无需提交）===
+data/resources-list.ts
+public/data/details/

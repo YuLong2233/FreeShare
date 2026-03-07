@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/generateResources.mjs && vite build",
     "preview": "vite preview",
     "gen": "node scripts/generateResources.mjs",
     "gen:clean": "node scripts/generateResources.mjs --clean"

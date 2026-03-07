@@ -1,4 +1,4 @@
-name: Generate and Sync Resources
+name: Validate Resources
 
 on:
   push:
@@ -9,12 +9,10 @@ on:
       - 'scripts/**'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  generate:
-    # 🔥 防止 bot 自己触发自己
-    if: github.actor != 'github-actions[bot]'
+  validate:
     runs-on: ubuntu-latest
 
     concurrency:
@@ -24,9 +22,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -36,25 +31,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run generation script
+      - name: Validate resource generation
         run: npm run gen
         env:
-          API_KEY: ${{ secrets.API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # ✅ 确保和远程同步，避免 push 被拒
-      - name: Rebase latest main
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase --autostash origin main
-
-      # ✅ 只有真的有改动才提交
-      - name: Commit and push changes
-        run: |
-          git add data/resources-list.ts "public/data/details/*.json" resources/*.md || true
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "chore: auto-sync resources data"
-            git push origin main
-          fi
+      - name: Verify build succeeds
+        run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

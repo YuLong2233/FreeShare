@@ -1,6 +1,0 @@
-{
-  "detailHtml": "<h3>资源描述</h3>\n<p><strong>Windows C盘深度清理工具</strong>是一款基于 Python 和 CustomTkinter 构建的免费系统清理软件。它涵盖 8 大核心清理项，包括系统临时文件、Windows 更新缓存、浏览器缓存、回收站等，能帮助用户快速释放 C 盘空间。界面采用现代化 CustomTkinter 框架，支持深色模式与中英双语切换，操作简单直观。程序以纯 Python 逻辑实现，无任何捆绑插件，清理过程完全透明可控。</p>\n<p><strong>支持清理的项目：</strong></p>\n<ul>\n<li>用户临时文件（<code>%TEMP%</code> 及本地应用临时目录）</li>\n<li>系统临时文件（Windows 临时文件夹及 Prefetch 预读取文件）</li>\n<li>Windows 更新缓存（SoftwareDistribution 下载目录）</li>\n<li>浏览器缓存（Chrome、Edge、Firefox）</li>\n<li>系统日志（CBS、DISM 及 IIS 等过期日志）</li>\n<li>回收站（一键清空所有驱动器）</li>\n<li>其他缓存（错误报告、DirectX 着色器缓存、npm/pip 缓存等）</li>\n<li>系统磁盘清理（可选调用 Windows 自带 <code>cleanmgr.exe</code>）</li>\n</ul>\n<h3>安装/使用步骤</h3>\n<ol>\n<li><strong>下载</strong>：点击右侧链接获取资源程序包。</li>\n<li><strong>运行</strong>：右键点击 <code>Windows_Cleaner.exe</code>，选择<strong>以管理员身份运行</strong>以获得最佳清理效果。</li>\n<li><strong>选择清理项</strong>：在界面中勾选需要清理的项目。</li>\n<li><strong>开始清理</strong>：点击&quot;开始清理&quot;按钮，等待清理完成即可查看释放空间大小。</li>\n</ol>\n<blockquote>\n<p>⚠️ <strong>注意</strong>：请务必以管理员权限运行，否则部分系统目录无法清理。</p>\n</blockquote>\n<h3>更新日志</h3>\n<ul>\n<li>v1.0：初始版本发布，支持 8 大核心清理项，中英双语界面。</li>\n</ul>",
-  "gallery": [
-    "https://i.postimg.cc/FRvxDNYN/wei-xin-tu-pian-20260228142814-239-902.png"
-  ]
-}
