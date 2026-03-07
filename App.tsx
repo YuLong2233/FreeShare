@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
-import { Search, Sparkles, BookOpen, Download, Menu, X, Rocket, BrainCircuit, Loader2, ArrowLeft, ExternalLink, Copy, Check, Zap, ChevronLeft, ChevronRight, Eye, Heart } from 'lucide-react';
+import { Search, Sparkles, BookOpen, Download, Menu, X, Rocket, BrainCircuit, Loader2, ArrowLeft, ExternalLink, Copy, Check, Zap, ChevronLeft, ChevronRight, Eye, Heart, ArrowUp } from 'lucide-react';
 import { RESOURCES } from './data/resources-list';
 import { ResourceCard } from './components/ResourceCard';
 import { Resource, ResourceDetail } from './types';
@@ -19,6 +19,20 @@ const ResourceDetailPage = () => {
   const [stats, setStats] = useState<ResourceStats>({ views: 0, likes: 0 });
   const [liked, setLiked] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // 监听滚动
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 400);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // 从轻量列表中找到基础信息
   const resource = RESOURCES.find(r => r.id === Number(id));
@@ -184,8 +198,8 @@ const ResourceDetailPage = () => {
                     onClick={handleLike}
                     disabled={likeLoading}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${liked
-                        ? 'bg-red-500 text-white shadow-lg shadow-red-500/30 scale-105'
-                        : 'bg-white/20 text-white hover:bg-white/30'
+                      ? 'bg-red-500 text-white shadow-lg shadow-red-500/30 scale-105'
+                      : 'bg-white/20 text-white hover:bg-white/30'
                       } disabled:opacity-50`}
                   >
                     <Heart className={`w-4 h-4 transition-transform ${liked ? 'fill-white scale-110' : ''}`} />
@@ -200,6 +214,17 @@ const ResourceDetailPage = () => {
           </div>
         </div>
       </div>
+
+      {/* 回到顶部按钮 */}
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-10 right-10 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all animate-in zoom-in duration-300 z-50 group pointer-events-auto"
+          title="回到顶部"
+        >
+          <ArrowUp className="w-6 h-6 text-indigo-600 group-hover:-translate-y-1 transition-transform" />
+        </button>
+      )}
     </div>
   );
 };
