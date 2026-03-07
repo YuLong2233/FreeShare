@@ -8,6 +8,31 @@ import { Resource } from '../types';
 
 export const RESOURCES: Resource[] = [
   {
+    "id": 16,
+    "title": "Antigravity-Proxy：免 TUN 强制代理工具",
+    "desc": "专为 Antigravity 打造，解决 AI 开发环境下的网络切换痛点。",
+    "category": "开发工具",
+    "date": "2026-03-07",
+    "tags": [
+      "Antigravity",
+      "代理工具",
+      "效率提升"
+    ],
+    "links": [
+      {
+        "name": "迅雷网盘",
+        "url": "https://pan.xunlei.com/s/VOn5XKau4NKGrcq-z-zMATXbA1?pwd=j4ab#"
+      },
+      {
+        "name": "夸克网盘",
+        "url": "https://pan.quark.cn/s/248e1aa65c18"
+      }
+    ],
+    "gallery": [
+      "https://i.postimg.cc/3wYVdDL3/image-20260307114352600.png"
+    ]
+  },
+  {
     "id": 14,
     "title": "微信多开防撤回(windows版)BetterWX",
     "desc": "微信多开防撤回(windows版)BetterWX",
