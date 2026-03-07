@@ -1,11 +1,12 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
-import { Search, Sparkles, BookOpen, Download, Github, Menu, X, Rocket, Info, ChevronRight, BrainCircuit, Loader2, ArrowLeft, ExternalLink, Copy, Check, Zap, ChevronLeft } from 'lucide-react';
+import { Search, Sparkles, BookOpen, Download, Menu, X, Rocket, BrainCircuit, Loader2, ArrowLeft, ExternalLink, Copy, Check, Zap, ChevronLeft, ChevronRight, Eye, Heart } from 'lucide-react';
 import { RESOURCES } from './data/resources-list';
 import { ResourceCard } from './components/ResourceCard';
 import { Resource, ResourceDetail } from './types';
 import { findResourcesWithAi } from './services/geminiService';
+import { fetchStats, recordView, toggleLike, isLiked, ResourceStats } from './services/statsService';
 
 // --- 资源详情页 ---
 const ResourceDetailPage = () => {
@@ -15,6 +16,9 @@ const ResourceDetailPage = () => {
   const [detail, setDetail] = useState<ResourceDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(true);
   const [detailError, setDetailError] = useState(false);
+  const [stats, setStats] = useState<ResourceStats>({ views: 0, likes: 0 });
+  const [liked, setLiked] = useState(false);
+  const [likeLoading, setLikeLoading] = useState(false);
 
   // 从轻量列表中找到基础信息
   const resource = RESOURCES.find(r => r.id === Number(id));
@@ -38,6 +42,23 @@ const ResourceDetailPage = () => {
         setDetailLoading(false);
       });
   }, [resource?.id]);
+
+  // 记录访问 + 拉取统计数据
+  useEffect(() => {
+    if (!resource) return;
+    setLiked(isLiked(resource.id));
+    recordView(resource.id);
+    fetchStats(resource.id).then(s => setStats(s));
+  }, [resource?.id]);
+
+  const handleLike = async () => {
+    if (!resource || likeLoading) return;
+    setLikeLoading(true);
+    const result = await toggleLike(resource.id);
+    setStats(prev => ({ ...prev, likes: result.likes }));
+    setLiked(result.liked);
+    setLikeLoading(false);
+  };
 
   if (!resource) {
     return (
@@ -152,8 +173,28 @@ const ResourceDetailPage = () => {
                   </div>
                 ))}
               </div>
-              <div className="mt-8 pt-8 border-t border-white/20 text-xs opacity-70 italic text-center">
-                最后更新于: {resource.date}
+              <div className="mt-8 pt-8 border-t border-white/20 space-y-4">
+                {/* 访问量 + 点赞 */}
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-xs opacity-70">
+                    <Eye className="w-3.5 h-3.5" />
+                    {stats.views.toLocaleString()} 次浏览
+                  </span>
+                  <button
+                    onClick={handleLike}
+                    disabled={likeLoading}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${liked
+                        ? 'bg-red-500 text-white shadow-lg shadow-red-500/30 scale-105'
+                        : 'bg-white/20 text-white hover:bg-white/30'
+                      } disabled:opacity-50`}
+                  >
+                    <Heart className={`w-4 h-4 transition-transform ${liked ? 'fill-white scale-110' : ''}`} />
+                    {stats.likes.toLocaleString()}
+                  </button>
+                </div>
+                <div className="text-xs opacity-70 italic text-center">
+                  最后更新于: {resource.date}
+                </div>
               </div>
             </div>
           </div>
