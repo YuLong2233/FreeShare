@@ -16,7 +16,7 @@ export const RESOURCES: Resource[] = [
     "tags": [
       "Antigravity",
       "代理工具",
-      "效率提升"
+      "AI"
     ],
     "links": [
       {
