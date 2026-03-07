@@ -33,6 +33,32 @@ export const RESOURCES: Resource[] = [
     ]
   },
   {
+    "id": 17,
+    "title": "Windows 安装 Claude Code 教程",
+    "desc": "完整安装与配置指南，助你在终端高效调用 Anthropic AI 编程助手。",
+    "category": "开发工具",
+    "date": "2026-03-07",
+    "tags": [
+      "Claude Code",
+      "Anthropic",
+      "环境配置",
+      "Node.js"
+    ],
+    "links": [
+      {
+        "name": "Node.js 官网",
+        "url": "https://nodejs.org"
+      },
+      {
+        "name": "Anthropic Console",
+        "url": "https://console.anthropic.com"
+      }
+    ],
+    "gallery": [
+      "https://i.postimg.cc/vBTDWTPW/claude.png"
+    ]
+  },
+  {
     "id": 14,
     "title": "微信多开防撤回(windows版)BetterWX",
     "desc": "微信多开防撤回(windows版)BetterWX",
