@@ -23,7 +23,9 @@ const ARGS = process.argv.slice(2);
 const CLEAN_MODE = ARGS.includes('--clean');
 
 // 确保目录存在
+const OUTPUT_DIR = path.dirname(OUTPUT_LIST_FILE); // './data'
 if (!fs.existsSync(RESOURCES_DIR)) fs.mkdirSync(RESOURCES_DIR, { recursive: true });
+if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
 if (!fs.existsSync(DETAILS_DIR)) fs.mkdirSync(DETAILS_DIR, { recursive: true });
 
 // ─── 工具函数 ────────────────────────────────────────
