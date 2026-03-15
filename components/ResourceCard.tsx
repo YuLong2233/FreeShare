@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Resource } from '../types';
 import { Calendar, ExternalLink, ArrowRight, Eye, Heart } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { fetchStats, ResourceStats } from '../services/statsService';
 
 interface ResourceCardProps {
@@ -10,29 +10,16 @@ interface ResourceCardProps {
 }
 
 export const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [stats, setStats] = useState<ResourceStats | null>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchStats(resource.id).then(setStats);
   }, [resource.id]);
 
-  const copyToClipboard = (e: React.MouseEvent, text: string, linkName: string) => {
-    e.stopPropagation(); // 防止触发卡片点击事件
-    navigator.clipboard.writeText(text);
-    setCopiedId(linkName);
-    setTimeout(() => setCopiedId(null), 2000);
-  };
-
-  const handleDownloadClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // 防止跳转到详情页
-  };
-
   return (
-    <div
-      onClick={() => navigate(`/resource/${resource.id}`)}
-      className="group cursor-pointer bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative"
+    <Link
+      to={`/resource/${resource.id}`}
+      className="group cursor-pointer bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 relative block"
     >
       <div className="flex justify-between items-start mb-4">
         <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400">
@@ -80,19 +67,16 @@ export const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
         </span>
         <div className="flex gap-2">
           {resource.links[0] && (
-            <a
-              href={resource.links[0].url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handleDownloadClick}
+            <button
+              onClick={(e) => { e.preventDefault(); window.open(resource.links[0].url, '_blank', 'noopener,noreferrer'); }}
               className="flex items-center gap-1.5 px-3 py-1 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-xs font-semibold shadow-sm"
             >
               快速下载
               <ExternalLink className="w-3 h-3" />
-            </a>
+            </button>
           )}
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

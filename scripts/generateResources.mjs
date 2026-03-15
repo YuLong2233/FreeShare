@@ -11,6 +11,8 @@ dotenv.config({ path: '.env.local' });
 const RESOURCES_DIR = './resources';
 const OUTPUT_LIST_FILE = './data/resources-list.ts'; // 轻量列表文件
 const DETAILS_DIR = './public/data/details';           // 详情 JSON 目录
+const SEO_PAGES_DIR = './public/resource';             // 预渲染 SEO 页面目录
+const SITE_URL = 'https://freeshare.uk';               // 网站域名（用于 sitemap 和 canonical）
 
 // GitHub 配置
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
@@ -232,6 +234,156 @@ const processMarkdownImages = async (content, resourceSlug, resourceFilePath, st
   return { content: newContent, nextIdx: idx };
 };
 
+// ─── SEO：转义 HTML 特殊字符 ─────────────────────────
+const escHtml = (str = '') => String(str)
+  .replace(/&/g, '&amp;')
+  .replace(/"/g, '&quot;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;');
+
+// ─── SEO：生成每个资源的独立 HTML 页面 ───────────────
+const generateSEOPages = (resources) => {
+  if (!fs.existsSync(SEO_PAGES_DIR)) fs.mkdirSync(SEO_PAGES_DIR, { recursive: true });
+
+  for (const res of resources) {
+    const pageDir = path.join(SEO_PAGES_DIR, String(res.id));
+    if (!fs.existsSync(pageDir)) fs.mkdirSync(pageDir, { recursive: true });
+
+    const canonicalUrl = `${SITE_URL}/resource/${res.id}/`;
+    const firstImage = res.gallery[0] || '';
+    const keywords = [...res.tags, res.category, 'FreeShare', '免费下载', '资源分享'].join(',');
+
+    const galleryHtml = res.gallery.length > 0
+      ? res.gallery.map(img => `<img src="${escHtml(img)}" alt="${escHtml(res.title)}" loading="lazy" style="width:100%;border-radius:12px;margin-bottom:12px;">`).join('\n')
+      : '';
+
+    const linksHtml = res.links.map(link => `
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin-bottom:12px;">
+        <div style="font-weight:600;margin-bottom:8px;color:#334155;">${escHtml(link.name)}</div>
+        ${link.code ? `<div style="font-family:monospace;background:#e0e7ff;color:#3730a3;padding:6px 10px;border-radius:6px;display:inline-block;margin-bottom:8px;font-size:13px;">提取码：${escHtml(link.code)}</div>` : ''}
+        <div><a href="${escHtml(link.url)}" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:#4f46e5;color:#fff;padding:8px 18px;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">立即下载 ↗</a></div>
+      </div>`).join('\n');
+
+    const tagsHtml = res.tags.length > 0
+      ? res.tags.map(t => `<span style="font-size:11px;background:#f1f5f9;color:#64748b;padding:2px 8px;border-radius:4px;font-weight:700;">#${escHtml(t)}</span>`).join(' ')
+      : '';
+
+    const html = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escHtml(res.title)} - FreeShare Pro</title>
+  <meta name="description" content="${escHtml(res.desc)}">
+  <meta name="keywords" content="${escHtml(keywords)}">
+  <meta property="og:title" content="${escHtml(res.title)} - FreeShare Pro">
+  <meta property="og:description" content="${escHtml(res.desc)}">
+  ${firstImage ? `<meta property="og:image" content="${escHtml(firstImage)}">` : ''}
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="${canonicalUrl}">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="${canonicalUrl}">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8fafc;color:#1e293b;line-height:1.6}
+    a{color:#4f46e5}
+    nav{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:10}
+    .logo{font-size:20px;font-weight:900;color:#1e293b;text-decoration:none;display:flex;align-items:center;gap:8px}
+    .logo-icon{width:32px;height:32px;background:#4f46e5;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px}
+    .nav-links{display:flex;gap:24px}
+    .nav-links a{text-decoration:none;color:#64748b;font-weight:600;font-size:14px}
+    .nav-links a:hover{color:#4f46e5}
+    main{max-width:960px;margin:0 auto;padding:40px 24px}
+    .badge{display:inline-block;background:#eef2ff;color:#4f46e5;padding:3px 12px;border-radius:99px;font-size:12px;font-weight:700;margin-bottom:16px}
+    h1{font-size:clamp(24px,4vw,36px);font-weight:900;line-height:1.2;margin-bottom:12px}
+    .desc{font-size:17px;color:#475569;margin-bottom:20px}
+    .meta{display:flex;gap:16px;font-size:13px;color:#94a3b8;margin-bottom:28px;align-items:center;flex-wrap:wrap}
+    .grid{display:grid;grid-template-columns:1fr;gap:32px}
+    @media(min-width:720px){.grid{grid-template-columns:1fr 320px}}
+    .card{background:#fff;border-radius:16px;border:1px solid #e2e8f0;padding:24px}
+    .card h2{font-size:16px;font-weight:700;margin-bottom:16px;color:#1e293b}
+    .get-card{background:#4f46e5;border-radius:16px;padding:24px;color:#fff}
+    .get-card h2{font-size:16px;font-weight:700;margin-bottom:16px;color:#fff}
+    footer{text-align:center;padding:40px 24px;color:#94a3b8;font-size:13px;border-top:1px solid #e2e8f0;margin-top:60px}
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="${SITE_URL}" class="logo">
+      <div class="logo-icon">⚡</div>
+      FreeShare
+    </a>
+    <div class="nav-links">
+      <a href="${SITE_URL}/">首页</a>
+      <a href="${SITE_URL}/downloads">资源库</a>
+      <a href="${SITE_URL}/guide">使用指南</a>
+    </div>
+  </nav>
+
+  <main>
+    <span class="badge">${escHtml(res.category)}</span>
+    <h1>${escHtml(res.title)}</h1>
+    <p class="desc">${escHtml(res.desc)}</p>
+    <div class="meta">
+      <span>📅 ${escHtml(res.date)}</span>
+      ${tagsHtml}
+    </div>
+
+    <div class="grid">
+      <div>
+        ${galleryHtml ? `<div class="card" style="margin-bottom:24px;"><h2>展示截图</h2>${galleryHtml}</div>` : ''}
+        <div class="card">
+          <h2>详细介绍 &amp; 使用指南</h2>
+          <div style="line-height:1.8;color:#334155;">${res.detailHtml}</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="get-card" style="position:sticky;top:80px;">
+          <h2>获取资源</h2>
+          ${linksHtml}
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.2);font-size:12px;opacity:0.7;text-align:center;">
+            最后更新：${escHtml(res.date)}
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; ${new Date().getFullYear()} <a href="${SITE_URL}">FreeShare Pro</a> · 精心打磨的开发者资源门户</p>
+  </footer>
+</body>
+</html>`;
+
+    fs.writeFileSync(path.join(pageDir, 'index.html'), html, 'utf8');
+  }
+  console.log(`  📄 已生成 ${resources.length} 个 SEO 页面 → ${SEO_PAGES_DIR}/{id}/index.html`);
+};
+
+// ─── SEO：生成 sitemap.xml ───────────────────────────
+const generateSitemap = (resources) => {
+  const staticUrls = [
+    { loc: `${SITE_URL}/`, priority: '1.0', changefreq: 'daily' },
+    { loc: `${SITE_URL}/downloads`, priority: '0.9', changefreq: 'daily' },
+    { loc: `${SITE_URL}/guide`, priority: '0.5', changefreq: 'monthly' },
+  ];
+  const resourceUrls = resources.map(res => ({
+    loc: `${SITE_URL}/resource/${res.id}/`,
+    lastmod: res.date,
+    priority: '0.8',
+    changefreq: 'weekly',
+  }));
+
+  const toTag = ({ loc, lastmod, priority, changefreq }) =>
+    `  <url>\n    <loc>${loc}</loc>\n${lastmod ? `    <lastmod>${lastmod}</lastmod>\n` : ''}    <changefreq>${changefreq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`;
+
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...staticUrls, ...resourceUrls].map(toTag).join('\n')}\n</urlset>`;
+
+  fs.writeFileSync('./public/sitemap.xml', sitemap, 'utf8');
+  console.log(`  🗺️  sitemap.xml 已生成（${staticUrls.length + resourceUrls.length} 条 URL）`);
+};
+
 // ─── 主流程 ──────────────────────────────────────────
 const generate = async () => {
   console.log('🚀 开始资源同步...\n');
@@ -344,6 +496,11 @@ export const RESOURCES: Resource[] = ${JSON.stringify(listData, null, 2)};
   console.log(`\n✅ 成功！已同步 ${processedResources.length} 个资源`);
   console.log(`   列表文件: ${OUTPUT_LIST_FILE}`);
   console.log(`   详情文件: ${DETAILS_DIR}/{id}.json (共 ${processedResources.length} 个)`);
+
+  // ── 3. 生成 SEO 预渲染页面 + sitemap ─────────────────
+  console.log('\n🔍 正在生成 SEO 页面和 sitemap...');
+  generateSEOPages(processedResources);
+  generateSitemap(processedResources);
 
   // ── 孤儿资源清理（仅在 --clean 模式下执行）──────────
   if (CLEAN_MODE && releaseId && GITHUB_TOKEN) {

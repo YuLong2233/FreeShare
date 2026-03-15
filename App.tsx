@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { HashRouter as Router, Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { Search, Sparkles, BookOpen, Download, Menu, X, Rocket, BrainCircuit, Loader2, ArrowLeft, ExternalLink, Copy, Check, Zap, ChevronLeft, ChevronRight, Eye, Heart, ArrowUp } from 'lucide-react';
 import { RESOURCES } from './data/resources-list';
 import { ResourceCard } from './components/ResourceCard';
@@ -63,6 +63,25 @@ const ResourceDetailPage = () => {
     setLiked(isLiked(resource.id));
     recordView(resource.id);
     fetchStats(resource.id).then(s => setStats(s));
+  }, [resource?.id]);
+
+  // 更新页面标题和 meta description，有助于谷歌索引
+  useEffect(() => {
+    if (!resource) return;
+    const prevTitle = document.title;
+    document.title = `${resource.title} - FreeShare Pro`;
+    let metaDesc = document.querySelector<HTMLMetaElement>('meta[name="description"]');
+    if (!metaDesc) {
+      metaDesc = document.createElement('meta');
+      metaDesc.name = 'description';
+      document.head.appendChild(metaDesc);
+    }
+    const prevDesc = metaDesc.content;
+    metaDesc.content = resource.desc;
+    return () => {
+      document.title = prevTitle;
+      metaDesc!.content = prevDesc;
+    };
   }, [resource?.id]);
 
   const handleLike = async () => {
